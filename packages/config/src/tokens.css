@@ -1,0 +1,30 @@
+:root {
+  --color-ink: #0c0c0c;
+  --color-ink-soft: #161616;
+  --color-charcoal: #1a1a1a;
+  --color-gold: #c5a059;
+  --color-gold-light: #d4b56e;
+  --color-gold-dark: #a8863f;
+  --color-cream: #f7f3eb;
+  --color-cream-dark: #ebe4d6;
+  --color-white: #ffffff;
+  --color-muted: #8a8a8a;
+  --color-border: rgba(255, 255, 255, 0.12);
+  --color-border-dark: rgba(0, 0, 0, 0.08);
+
+  --font-display: "Cormorant Garamond", "Times New Roman", serif;
+  --font-body: "Manrope", system-ui, sans-serif;
+  --font-script: "Great Vibes", cursive;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  --admin-bg: #f4f4f5;
+  --admin-surface: #ffffff;
+  --admin-border: #e4e4e7;
+  --admin-text: #18181b;
+  --admin-muted: #71717a;
+  --admin-accent: #c5a059;
+}
