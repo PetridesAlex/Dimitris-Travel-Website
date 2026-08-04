@@ -49,9 +49,11 @@ html[data-uj-ready] [data-uj-preloader] {
   display: none !important;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+@layer base {
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 
 ::selection {

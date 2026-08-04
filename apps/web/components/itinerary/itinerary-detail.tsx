@@ -47,13 +47,16 @@ export function ItineraryHero({
       <div className="mx-auto max-w-5xl text-center">
         <Link
           href={`/${locale}/itineraries`}
-          className="group relative z-20 mb-10 inline-flex items-center gap-3 border border-[#c5a059]/50 bg-white px-5 py-2.5 text-[13px] font-semibold tracking-[0.2em] text-[#0c0c0c] uppercase shadow-[0_10px_30px_-18px_rgba(12,12,12,0.35)] transition duration-300 hover:border-[#c5a059] hover:bg-[#c5a059] hover:text-[#0c0c0c]"
+          className="group relative z-20 mb-10 inline-flex items-center gap-3 border border-[#c5a059]/60 bg-[#f7f3eb] px-5 py-2.5 text-[13px] font-semibold tracking-[0.2em] text-[#0c0c0c] uppercase shadow-[0_10px_30px_-18px_rgba(12,12,12,0.35)] transition duration-300 hover:border-[#c5a059] hover:bg-[#c5a059] hover:text-[#0c0c0c]"
         >
           <ArrowLeft
             className="h-4 w-4 shrink-0 text-[#c5a059] transition duration-300 group-hover:text-[#0c0c0c]"
             strokeWidth={2}
+            aria-hidden
           />
-          Back to all journeys
+          <span className="text-[#0c0c0c] transition duration-300 group-hover:text-[#0c0c0c]">
+            Back to all journeys
+          </span>
         </Link>
 
         <FadeIn direction="up" blur>
