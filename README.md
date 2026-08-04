@@ -80,11 +80,10 @@ This is an npm workspaces monorepo. In **Project → Settings → General**:
 |---|---|
 | Root Directory | `apps/web` |
 | Framework Preset | Next.js |
-| Build Command | leave default / from `apps/web/vercel.json` |
-| Output Directory | **leave empty** (do not set `apps/web/.next`) |
-| Install Command | from `apps/web/vercel.json` (`cd ../.. && npm install`) |
+| Build / Install / Output | leave overrides **OFF** (uses `apps/web/vercel.json`) |
+| Include files outside the root directory | **ON** |
 
-Setting Output Directory to `apps/web/.next` while Root Directory is already `apps/web` doubles the path (`apps/web/apps/web/.next`) and fails the deploy. Clear that field if a past setup left it filled.
+Do **not** set Output Directory to `apps/web/.next` — that doubles the path and fails the deploy.
 
 Mirror all vars from [`.env.example`](.env.example) under **Settings → Environment Variables** (Production + Preview).
 
