@@ -7,11 +7,12 @@ import { hotelQueries } from '@/features/catalog/queries';
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 export async function generateStaticParams() {
-  return hotelQueries.getAll().map((h) => ({ slug: h.slug }));
+  const all = await hotelQueries.getAll();
+  return all.map((h) => ({ slug: h.slug }));
 }
 export default async function HotelDetailPage({ params }: Props) {
   const { locale, slug } = await params;
-  const hotel = hotelQueries.getBySlug(slug);
+  const hotel = await hotelQueries.getBySlug(slug);
   if (!hotel) notFound();
   return (
     <>

@@ -2,7 +2,11 @@
 
 import { z } from 'zod';
 import { sendEnquiryNotification } from '@/lib/email';
-import { createClient, isDemoMode } from '@/lib/supabase/server';
+import {
+  createAnonClient,
+  createServiceClient,
+  isDemoMode,
+} from '@/lib/supabase/server';
 
 const enquirySchema = z.object({
   fullName: z.string().min(2),
@@ -16,27 +20,39 @@ const enquirySchema = z.object({
   travelStyle: z.string().optional(),
   notes: z.string().optional(),
   locale: z.string().default('en'),
+  brief: z.string().optional(),
 });
 
 export async function submitEnquiry(input: z.infer<typeof enquirySchema>) {
   const data = enquirySchema.parse(input);
 
+  const notes = [data.destination, data.notes, data.brief]
+    .filter(Boolean)
+    .join('\n\n');
+
   if (!isDemoMode()) {
-    const supabase = await createClient();
-    if (supabase) {
-      // Typed insert once generated Supabase types are wired; safe cast for v1.
-      await supabase.from('enquiries').insert({
-        full_name: data.fullName,
-        email: data.email,
-        phone: data.phone,
-        travel_date: data.travelDate || null,
-        budget: data.budget,
-        adults: data.adults,
-        children: data.children,
-        travel_style: data.travelStyle,
-        notes: [data.destination, data.notes].filter(Boolean).join('\n'),
-        locale: data.locale,
-      } as never);
+    const row = {
+      full_name: data.fullName,
+      email: data.email,
+      phone: data.phone || null,
+      travel_date: data.travelDate || null,
+      budget: data.budget || null,
+      adults: data.adults,
+      children: data.children,
+      travel_style: data.travelStyle || null,
+      notes,
+      locale: data.locale,
+    };
+
+    // Prefer service role (server-validated) so public forms work even if anon RLS/grants are tight.
+    const service = createServiceClient();
+    const client = service ?? createAnonClient();
+    if (client) {
+      const { error } = await client.from('enquiries').insert(row);
+      if (error) {
+        console.error('enquiry insert failed:', error.message);
+        throw new Error('Could not save enquiry. Please try again.');
+      }
     }
   }
 
@@ -44,7 +60,7 @@ export async function submitEnquiry(input: z.infer<typeof enquirySchema>) {
     fullName: data.fullName,
     email: data.email,
     destination: data.destination,
-    notes: data.notes,
+    notes,
   });
 
   return { ok: true };
@@ -54,12 +70,17 @@ export async function subscribeNewsletter(email: string, locale = 'en') {
   const parsed = z.string().email().parse(email);
 
   if (!isDemoMode()) {
-    const supabase = await createClient();
-    if (supabase) {
-      await supabase.from('newsletter_subscribers').upsert({
+    const service = createServiceClient();
+    const client = service ?? createAnonClient();
+    if (client) {
+      const { error } = await client.from('newsletter_subscribers').upsert({
         email: parsed,
         locale,
-      } as never);
+      });
+      if (error) {
+        console.error('newsletter upsert failed:', error.message);
+        throw new Error('Could not subscribe. Please try again.');
+      }
     }
   }
 

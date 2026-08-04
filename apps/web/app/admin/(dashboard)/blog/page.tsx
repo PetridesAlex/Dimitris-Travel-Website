@@ -1,22 +1,40 @@
 import Link from 'next/link';
-import { AdminPageHeader, DataTable, StatusBadge } from '@/components/admin/page-header';
+import { AdminPageHeader } from '@/components/admin/page-header';
+import { BlogManager } from '@/components/admin/blog-manager';
 import { blogQueries } from '@/features/catalog/queries';
 
-export default function AdminBlogPage() {
-  const items = blogQueries.getAll();
+export default async function AdminBlogPage() {
+  const items = await blogQueries.getAll();
+
   return (
     <div>
-      <AdminPageHeader title="Blog" description="Inspiration articles with SEO fields." action={{ label: 'New post', href: '#' }} />
-      <DataTable
-        columns={['Title', 'Category', 'Author', 'Published', 'Status', '']}
-        rows={items.map((p) => [
-          <span key="n" className="font-medium">{p.title}</span>,
-          p.category,
-          p.author,
-          p.publishedAt,
-          <StatusBadge key="s" status="published" />,
-          <Link key="l" className="text-[var(--color-gold-dark)]" href={`/en/blog/${p.slug}`}>View</Link>,
-        ])}
+      <AdminPageHeader
+        eyebrow="Publish"
+        title="Blog"
+        description="Inspiration articles with SEO fields — shape the editorial voice of Uncharted Journeys."
+        action={{ label: 'New post', href: '/admin/blog/new' }}
+        actions={
+          <Link
+            href="/en/blog"
+            target="_blank"
+            className="inline-flex h-11 items-center border border-[var(--admin-border)] bg-white px-4 text-[11px] font-semibold tracking-[0.14em] text-[var(--admin-muted)] uppercase transition hover:border-[#c5a059]/50 hover:text-[#a8863f]"
+          >
+            Preview public
+          </Link>
+        }
+      />
+      <BlogManager
+        items={items.map((p) => ({
+          id: p.id,
+          slug: p.slug,
+          title: p.title,
+          excerpt: p.excerpt,
+          category: p.category,
+          author: p.author,
+          publishedAt: p.publishedAt,
+          image: p.image,
+          status: (p as { status?: string }).status || 'published',
+        }))}
       />
     </div>
   );

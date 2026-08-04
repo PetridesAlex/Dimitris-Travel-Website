@@ -247,7 +247,7 @@ export function ParallaxHeroMedia({
     offset: ['start start', 'end start'],
   });
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '18%']);
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
+  const scrollScale = useTransform(scrollYProgress, [0, 1], [1, 1.06]);
 
   if (reduce) {
     return (
@@ -259,8 +259,22 @@ export function ParallaxHeroMedia({
 
   return (
     <div ref={ref} className={cn('absolute inset-0 overflow-hidden', className)}>
-      <motion.div style={{ y, scale }} className="absolute inset-[-8%]">
-        {children}
+      <motion.div style={{ y, scale: scrollScale }} className="absolute inset-[-14%]">
+        <motion.div
+          className="h-full w-full will-change-transform"
+          animate={{
+            scale: [1, 1.14, 1.08, 1.12, 1],
+            x: ['0%', '-2.5%', '1.8%', '-1.2%', '0%'],
+            y: ['0%', '1.8%', '-1.4%', '1%', '0%'],
+          }}
+          transition={{
+            duration: 32,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        >
+          {children}
+        </motion.div>
       </motion.div>
     </div>
   );

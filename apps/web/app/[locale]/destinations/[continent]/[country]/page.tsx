@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { notFound } from 'next/navigation';
 import { LazySection, RevealImage } from '@/components/motion/fade-in';
 import Link from 'next/link';
@@ -34,8 +35,8 @@ type Props = {
 };
 
 export async function generateStaticParams() {
-  return destinationQueries
-    .getCountries()
+  const countries = await destinationQueries.getCountries();
+  return countries
     .map((c) => {
       const [continent, country] = c.slugPath.split('/');
       return { continent, country };
@@ -45,7 +46,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props) {
   const { continent, country } = await params;
-  const dest = destinationQueries.getBySlugPath(`${continent}/${country}`);
+  const dest = await destinationQueries.getBySlugPath(`${continent}/${country}`);
   if (!dest) return {};
   return {
     title: dest.name,
@@ -56,19 +57,32 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function CountryPage({ params }: Props) {
   const { locale, continent, country } = await params;
-  const dest = destinationQueries.getBySlugPath(`${continent}/${country}`);
+  const dest = await destinationQueries.getBySlugPath(`${continent}/${country}`);
   if (!dest || dest.type !== 'country') notFound();
 
-  const parent = destinationQueries.getAll().find((d) => d.id === dest.parentId);
-  const cities = destinationQueries.getCitiesByCountry(dest.id);
-  const hotels = hotelQueries
-    .getAll()
-    .filter((h) =>
+  const [
+    parent,
+    cities,
+    allHotels,
+    itineraries,
+    featuredExperiences,
+    faqs,
+  ] = await Promise.all([
+    destinationQueries.getBySlugPath(continent),
+    destinationQueries.getCitiesByCountry(dest.id),
+    hotelQueries.getAll(),
+    itineraryQueries.getByDestination(dest.id),
+    experienceQueries.getFeatured(),
+    faqQueries.getAll(),
+  ]);
+  const hotels = allHotels.filter(
+    (h) =>
       cities.some((c) => c.id === h.destinationId) || h.destinationId === dest.id,
-    );
-  const itineraries = itineraryQueries.getByDestination(dest.id);
-  const experiences = experienceQueries.getFeatured().slice(0, 5);
-  const faqs = faqQueries.getAll();
+  );
+  const experiences = featuredExperiences.slice(0, 5);
+  const journeyItineraries = itineraries.length
+    ? itineraries
+    : await itineraryQueries.getFeatured();
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -132,7 +146,7 @@ export default async function CountryPage({ params }: Props) {
               { label: 'Weather', value: dest.weather },
             ]}
             action={
-              <Button asChild variant="dark" size="lg">
+              <Button asChild size="lg">
                 <a href="#faqs">Practical Info</a>
               </Button>
             }
@@ -234,7 +248,7 @@ export default async function CountryPage({ params }: Props) {
             light
           />
           <div className="grid gap-6 lg:grid-cols-3">
-            {(itineraries.length ? itineraries : itineraryQueries.getFeatured())
+            {journeyItineraries
               .slice(0, 3)
               .map((itin) => (
                 <ItineraryCard
@@ -262,7 +276,7 @@ export default async function CountryPage({ params }: Props) {
         <div className="mx-auto max-w-3xl">
           <SectionHeading eyebrow="Practical info" title="Frequently asked questions" light />
           <Accordion type="single" collapsible className="w-full">
-            {faqs.map((faq) => (
+            {faqs.map((faq: any) => (
               <AccordionItem key={faq.id} value={faq.id}>
                 <AccordionTrigger>{faq.question}</AccordionTrigger>
                 <AccordionContent>{faq.answer}</AccordionContent>

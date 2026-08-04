@@ -3,7 +3,8 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronRight } from 'lucide-react';
+import { ArrowRight, ChevronRight } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { FadeIn, RevealImage, Stagger } from '@/components/motion/fade-in';
 import { cn, formatCurrency } from '@/lib/utils';
 
@@ -229,29 +230,101 @@ export function CtaBand({
   title: string;
   locale?: string;
 }) {
+  const reduce = useReducedMotion();
+
   return (
-    <section className="border-t border-black/5 bg-[var(--color-cream)]">
-      <FadeIn
-        className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 px-6 py-10 md:flex-row md:items-center lg:px-8"
-        direction="up"
-        distance={28}
-        blur
-      >
-        <div className="flex items-start gap-4">
-          <div className="mt-1 h-10 w-10 rounded-full border border-[var(--color-gold)]/40 text-center leading-10 text-[var(--color-gold)]">
-            ✦
+    <section className="relative overflow-hidden border-t border-[#c5a059]/15 bg-[#f7f3eb]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c5a059]/50 to-transparent" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_90%_50%,rgba(197,160,89,0.1),transparent_55%)]" />
+
+      {/* Soft loading sweep across the band */}
+      {!reduce ? (
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+          animate={{ x: ['-40%', '340%'] }}
+          transition={{ duration: 4.5, repeat: Infinity, ease: 'linear', repeatDelay: 1.2 }}
+        />
+      ) : null}
+
+      <div className="relative mx-auto flex max-w-7xl flex-col items-start justify-between gap-8 px-6 py-12 md:flex-row md:items-center lg:px-8 lg:py-14">
+        <FadeIn direction="up" distance={28} blur className="flex items-start gap-4 md:gap-5">
+          <motion.div
+            className="relative mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#c5a059]/45 text-[#c5a059]"
+            animate={
+              reduce
+                ? undefined
+                : {
+                    boxShadow: [
+                      '0 0 0 0 rgba(197,160,89,0.35)',
+                      '0 0 0 10px rgba(197,160,89,0)',
+                      '0 0 0 0 rgba(197,160,89,0)',
+                    ],
+                  }
+            }
+            transition={{ duration: 2.4, repeat: Infinity, ease: 'easeOut' }}
+          >
+            <motion.span
+              animate={reduce ? undefined : { rotate: [0, 90, 180, 270, 360] }}
+              transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+              className="text-lg leading-none"
+            >
+              ✦
+            </motion.span>
+          </motion.div>
+
+          <div>
+            <p className="mb-2 text-[10px] font-semibold tracking-[0.3em] text-[#c5a059] uppercase">
+              Begin your journey
+            </p>
+            <p className="max-w-xl font-[family-name:var(--font-display)] text-2xl leading-snug text-[#0c0c0c] md:text-3xl">
+              {title}
+            </p>
           </div>
-          <p className="max-w-xl font-[family-name:var(--font-display)] text-2xl text-[var(--color-ink)] md:text-3xl">
-            {title}
-          </p>
-        </div>
-        <Link
-          href={`/${locale}/plan-your-journey`}
-          className="inline-flex h-11 items-center bg-[var(--color-gold)] px-6 text-sm font-medium tracking-wide text-[var(--color-ink)] uppercase transition hover:bg-[var(--color-gold-light)]"
-        >
-          Plan Your Journey
-        </Link>
-      </FadeIn>
+        </FadeIn>
+
+        <FadeIn direction="up" distance={24} delay={0.15}>
+          <Link
+            href={`/${locale}/plan-your-journey`}
+            className="group relative inline-flex h-12 min-w-[220px] items-center justify-center overflow-hidden px-7 text-[12px] font-semibold tracking-[0.2em] text-[#0c0c0c] uppercase shadow-[0_14px_40px_-18px_rgba(197,160,89,0.9)]"
+          >
+            {/* Base rich gold fill */}
+            <span
+              aria-hidden
+              className="absolute inset-0 bg-gradient-to-r from-[#a8863f] via-[#c5a059] to-[#d4b56e]"
+            />
+
+            {/* Loading-style fill that sweeps continuously */}
+            {!reduce ? (
+              <motion.span
+                aria-hidden
+                className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-transparent via-white/35 to-transparent"
+                animate={{ x: ['-100%', '100%'] }}
+                transition={{
+                  duration: 1.8,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  repeatDelay: 0.6,
+                }}
+              />
+            ) : null}
+
+            {/* Hover fill deepen */}
+            <span
+              aria-hidden
+              className="absolute inset-0 origin-left scale-x-0 bg-gradient-to-r from-[#8f7132] via-[#b8923f] to-[#c5a059] transition-transform duration-500 ease-out group-hover:scale-x-100"
+            />
+
+            <span className="relative z-10 inline-flex items-center gap-2.5">
+              Plan Your Journey
+              <ArrowRight
+                className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+                strokeWidth={1.75}
+              />
+            </span>
+          </Link>
+        </FadeIn>
+      </div>
     </section>
   );
 }

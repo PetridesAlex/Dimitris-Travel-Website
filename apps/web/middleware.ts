@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
+import { isCmsAuthenticatedFromRequest } from '@/lib/cms/auth';
 import { DEFAULT_LOCALE, isValidLocale } from '@/lib/i18n/config';
 
 export async function middleware(request: NextRequest) {
@@ -13,16 +14,30 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Admin auth gate (demo: allow all; with Supabase, redirect unauthenticated)
   if (pathname.startsWith('/admin')) {
-    if (pathname === '/admin/login') {
-      return NextResponse.next();
+    const { response, user } = await updateSession(request);
+    const cookieOk = await isCmsAuthenticatedFromRequest(request);
+    const authed = Boolean(user) || cookieOk;
+
+    if (pathname === '/admin/login' || pathname.startsWith('/admin/login/')) {
+      if (authed) {
+        const url = request.nextUrl.clone();
+        url.pathname = '/admin';
+        return NextResponse.redirect(url);
+      }
+      return response;
     }
-    const response = await updateSession(request);
+
+    if (!authed) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/admin/login';
+      url.searchParams.set('next', pathname);
+      return NextResponse.redirect(url);
+    }
+
     return response;
   }
 
-  // Locale prefix for public site
   const segment = pathname.split('/')[1];
   if (!isValidLocale(segment)) {
     const url = request.nextUrl.clone();
@@ -30,7 +45,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  const response = await updateSession(request);
+  const { response } = await updateSession(request);
   response.headers.set('x-locale', segment);
   return response;
 }

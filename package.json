@@ -11,7 +11,8 @@
     "dev": "npm run dev --workspace=web",
     "build": "npm run build --workspace=web",
     "lint": "npm run lint --workspace=web",
-    "start": "npm run start --workspace=web"
+    "start": "npm run start --workspace=web",
+    "seed:demo": "npx tsx apps/web/scripts/seed-from-demo.ts"
   },
   "engines": {
     "node": ">=20"

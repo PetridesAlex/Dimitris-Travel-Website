@@ -21,10 +21,17 @@
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
 
-  --admin-bg: #f4f4f5;
-  --admin-surface: #ffffff;
-  --admin-border: #e4e4e7;
-  --admin-text: #18181b;
-  --admin-muted: #71717a;
+  --admin-bg: #f3efe6;
+  --admin-surface: #fffcf7;
+  --admin-surface-elevated: #ffffff;
+  --admin-border: #e5ddd0;
+  --admin-border-strong: #d4c8b4;
+  --admin-text: #14110d;
+  --admin-muted: #7a7166;
   --admin-accent: #c5a059;
+  --admin-sidebar: #12100e;
+  --admin-sidebar-muted: rgba(255, 255, 255, 0.55);
+  --admin-sidebar-border: rgba(197, 160, 89, 0.18);
+  --admin-sidebar-hover: rgba(255, 255, 255, 0.05);
+  --admin-sidebar-active: rgba(197, 160, 89, 0.16);
 }

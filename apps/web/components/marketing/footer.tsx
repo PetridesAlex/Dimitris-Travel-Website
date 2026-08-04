@@ -248,10 +248,10 @@ export function Footer({ locale = 'en' }: { locale?: string }) {
           <div className="flex flex-col items-center justify-between gap-4 text-[11px] tracking-[0.12em] text-white/35 uppercase sm:flex-row">
             <p>© {year} Uncharted Journeys. All rights reserved.</p>
             <div className="flex flex-wrap items-center justify-center gap-6">
-              <Link href={`${prefix}/contact`} className="transition hover:text-[#c5a059]">
+              <Link href={`${prefix}/privacy`} className="transition hover:text-[#c5a059]">
                 Privacy
               </Link>
-              <Link href={`${prefix}/contact`} className="transition hover:text-[#c5a059]">
+              <Link href={`${prefix}/terms`} className="transition hover:text-[#c5a059]">
                 Terms
               </Link>
               <span className="hidden text-[#c5a059]/40 sm:inline">·</span>

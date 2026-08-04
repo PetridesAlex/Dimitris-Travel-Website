@@ -1,8 +1,14 @@
 import { NextResponse } from 'next/server';
+import { getCmsSession } from '@/lib/cms/auth';
 import { enquiryQueries } from '@/features/catalog/queries';
 
 export async function GET() {
-  const rows = enquiryQueries.getAll();
+  const session = await getCmsSession();
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const rows = await enquiryQueries.getAll();
   const header = [
     'id',
     'fullName',

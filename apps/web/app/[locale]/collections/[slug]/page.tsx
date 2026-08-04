@@ -6,13 +6,14 @@ import { collectionQueries, itineraryQueries } from '@/features/catalog/queries'
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 export async function generateStaticParams() {
-  return collectionQueries.getAll().map((c) => ({ slug: c.slug }));
+  const all = await collectionQueries.getAll();
+  return all.map((c) => ({ slug: c.slug }));
 }
 export default async function CollectionDetailPage({ params }: Props) {
   const { locale, slug } = await params;
-  const col = collectionQueries.getBySlug(slug);
+  const col = await collectionQueries.getBySlug(slug);
   if (!col) notFound();
-  const itineraries = itineraryQueries.getFeatured();
+  const itineraries = await itineraryQueries.getFeatured();
   return (
     <>
       <Hero eyebrow="Collection" title={col.name} subtitle={col.tagline} description={col.description} image={col.image} primaryCta={{ label: 'Plan Your Journey', href: `/${locale}/plan-your-journey` }} tall={false} />

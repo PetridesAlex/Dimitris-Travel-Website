@@ -7,19 +7,20 @@ import { blogQueries } from '@/features/catalog/queries';
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
 export async function generateStaticParams() {
-  return blogQueries.getAll().map((p) => ({ slug: p.slug }));
+  const all = await blogQueries.getAll();
+  return all.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const post = blogQueries.getBySlug(slug);
+  const post = await blogQueries.getBySlug(slug);
   if (!post) return {};
   return { title: post.title, description: post.excerpt };
 }
 
 export default async function BlogPostPage({ params }: Props) {
   const { locale, slug } = await params;
-  const post = blogQueries.getBySlug(slug);
+  const post = await blogQueries.getBySlug(slug);
   if (!post) notFound();
 
   const jsonLd = {

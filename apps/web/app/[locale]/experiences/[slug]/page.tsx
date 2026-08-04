@@ -8,19 +8,20 @@ import { experienceQueries } from '@/features/catalog/queries';
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
 export async function generateStaticParams() {
-  return experienceQueries.getAll().map((e) => ({ slug: e.slug }));
+  const all = await experienceQueries.getAll();
+  return all.map((e) => ({ slug: e.slug }));
 }
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const exp = experienceQueries.getBySlug(slug);
+  const exp = await experienceQueries.getBySlug(slug);
   if (!exp) return {};
   return { title: exp.name, description: exp.description };
 }
 
 export default async function ExperienceDetailPage({ params }: Props) {
   const { locale, slug } = await params;
-  const exp = experienceQueries.getBySlug(slug);
+  const exp = await experienceQueries.getBySlug(slug);
   if (!exp) notFound();
   return (
     <>

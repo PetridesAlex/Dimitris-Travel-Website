@@ -16,7 +16,7 @@ export default async function DestinationsIndexPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const continents = destinationQueries.getContinents();
+  const continents = await destinationQueries.getContinents();
 
   return (
     <div className="bg-[var(--color-ink)] pt-28">

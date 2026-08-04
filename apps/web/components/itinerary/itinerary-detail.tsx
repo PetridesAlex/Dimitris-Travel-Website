@@ -17,6 +17,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { FadeIn, LazySection, RevealImage } from '@/components/motion/fade-in';
 import { Button } from '@/components/ui/button';
 import { EnquiryForm } from '@/components/forms/enquiry-form';
+import { JourneyCountryMap } from '@/components/itinerary/journey-country-map';
 import type {
   DemoItinerary,
   DemoItineraryGlanceStop,
@@ -47,9 +48,12 @@ export function ItineraryHero({
         <FadeIn direction="up" blur>
           <Link
             href={`/${locale}/itineraries`}
-            className="mb-10 inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.2em] text-[var(--color-ink)]/55 uppercase transition hover:text-[var(--color-gold)]"
+            className="group mb-10 inline-flex items-center gap-3 border border-[#c5a059]/40 bg-white/70 px-5 py-2.5 text-[13px] font-semibold tracking-[0.2em] text-[#0c0c0c] uppercase shadow-[0_10px_30px_-18px_rgba(12,12,12,0.35)] transition duration-300 hover:border-[#c5a059] hover:bg-[#c5a059] hover:text-[#0c0c0c]"
           >
-            <ArrowLeft className="h-3.5 w-3.5" />
+            <ArrowLeft
+              className="h-4 w-4 text-[#c5a059] transition duration-300 group-hover:text-[#0c0c0c]"
+              strokeWidth={2}
+            />
             Back to all journeys
           </Link>
           <h1 className="font-[family-name:var(--font-display)] text-4xl leading-[1.1] text-[var(--color-ink)] md:text-6xl lg:text-7xl">
@@ -79,155 +83,122 @@ export function JourneyAtAGlance({
   return (
     <LazySection className="bg-[var(--color-cream)] px-6 pb-16 lg:px-8">
       <motion.div
-        className="relative mx-auto max-w-5xl overflow-hidden rounded-2xl border border-[#c5a059]/20 bg-white p-7 shadow-[0_30px_80px_-36px_rgba(12,12,12,0.45)] md:p-10 lg:p-12"
+        className="relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-[#c5a059]/20 bg-white p-8 shadow-[0_30px_80px_-36px_rgba(12,12,12,0.45)] md:p-12 lg:p-14"
         initial={reduce ? false : { opacity: 0, y: 40, filter: 'blur(8px)' }}
         whileInView={reduce ? undefined : { opacity: 1, y: 0, filter: 'blur(0px)' }}
-        viewport={{ once: true, amount: 0.25 }}
+        viewport={{ once: true, amount: 0.2 }}
         transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
       >
-        {/* Premium atmosphere */}
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(197,160,89,0.08),transparent_45%)]" />
         <div className="pointer-events-none absolute top-0 left-0 h-full w-[3px] bg-gradient-to-b from-[#c5a059] via-[#c5a059]/40 to-transparent" />
 
-        <div className="relative flex flex-col gap-10 lg:flex-row lg:items-stretch lg:justify-between lg:gap-12">
-          <div className="flex-1">
+        <div className="relative">
+          <div className="mx-auto max-w-3xl text-center">
             <motion.p
               className="text-[11px] font-semibold tracking-[0.28em] text-[#c5a059] uppercase"
-              initial={reduce ? false : { opacity: 0, x: -12 }}
-              whileInView={reduce ? undefined : { opacity: 1, x: 0 }}
+              initial={reduce ? false : { opacity: 0, y: 10 }}
+              whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.15, duration: 0.6 }}
             >
               Journey at a glance
             </motion.p>
+            <motion.h2
+              className="mt-3 font-[family-name:var(--font-display)] text-3xl text-[#0c0c0c] md:text-4xl"
+              initial={reduce ? false : { opacity: 0, y: 12 }}
+              whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.22, duration: 0.6 }}
+            >
+              {stops.length} curated stops across {countryName}
+            </motion.h2>
+          </div>
 
-            {/* Connected timeline */}
-            <div className="relative mt-8">
-              {/* Animated connector line (desktop) */}
-              <motion.div
-                className="pointer-events-none absolute top-6 right-8 left-8 hidden h-px origin-left bg-gradient-to-r from-[#c5a059]/20 via-[#c5a059] to-[#c5a059]/20 md:block"
-                initial={reduce ? false : { scaleX: 0 }}
-                whileInView={reduce ? undefined : { scaleX: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1.1, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              />
+          <div className="relative mt-10 md:mt-12">
+            <motion.div
+              className="pointer-events-none absolute top-8 right-[8%] left-[8%] hidden h-px origin-left bg-gradient-to-r from-[#c5a059]/20 via-[#c5a059] to-[#c5a059]/20 md:block"
+              initial={reduce ? false : { scaleX: 0 }}
+              whileInView={reduce ? undefined : { scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.1, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            />
 
-              <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-5 md:gap-3">
-                {stops.map((stop, index) => {
-                  const Icon = glanceIcons[stop.icon] ?? Building2;
-                  return (
-                    <motion.div
-                      key={stop.label}
-                      className="group relative text-center"
-                      initial={
-                        reduce
-                          ? false
-                          : { opacity: 0, y: 28, scale: 0.92 }
-                      }
-                      whileInView={
-                        reduce
-                          ? undefined
-                          : { opacity: 1, y: 0, scale: 1 }
-                      }
-                      viewport={{ once: true }}
-                      transition={{
-                        duration: 0.65,
-                        delay: 0.2 + index * 0.1,
-                        ease: [0.22, 1, 0.36, 1],
-                      }}
-                      whileHover={reduce ? undefined : { y: -6 }}
-                    >
-                      <div className="relative mx-auto mb-4 flex h-14 w-14 items-center justify-center">
-                        <motion.span
-                          className="absolute inset-0 rounded-full border border-[#c5a059]/30"
-                          animate={
-                            reduce
-                              ? undefined
-                              : {
-                                  scale: [1, 1.12, 1],
-                                  opacity: [0.5, 0.15, 0.5],
-                                }
-                          }
-                          transition={{
-                            duration: 2.8,
-                            repeat: Infinity,
-                            delay: index * 0.25,
-                            ease: 'easeInOut',
-                          }}
-                        />
-                        <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full border border-[#c5a059]/50 bg-[#f7f3eb] text-[#c5a059] shadow-[0_8px_24px_-12px_rgba(197,160,89,0.8)] transition-all duration-500 group-hover:border-[#c5a059] group-hover:bg-[#c5a059] group-hover:text-[#0c0c0c]">
-                          <Icon className="h-5 w-5" strokeWidth={1.25} />
-                        </div>
+            <div
+              className={cn(
+                'grid gap-8',
+                stops.length <= 3
+                  ? 'grid-cols-1 sm:grid-cols-3'
+                  : stops.length === 4
+                    ? 'grid-cols-2 md:grid-cols-4'
+                    : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5',
+              )}
+            >
+              {stops.map((stop, index) => {
+                const Icon = glanceIcons[stop.icon] ?? Building2;
+                return (
+                  <motion.div
+                    key={stop.label}
+                    className="group relative text-center"
+                    initial={
+                      reduce ? false : { opacity: 0, y: 28, scale: 0.92 }
+                    }
+                    whileInView={
+                      reduce ? undefined : { opacity: 1, y: 0, scale: 1 }
+                    }
+                    viewport={{ once: true }}
+                    transition={{
+                      duration: 0.65,
+                      delay: 0.2 + index * 0.1,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    whileHover={reduce ? undefined : { y: -6 }}
+                  >
+                    <div className="relative mx-auto mb-5 flex h-16 w-16 items-center justify-center">
+                      <motion.span
+                        className="absolute inset-0 rounded-full border border-[#c5a059]/30"
+                        animate={
+                          reduce
+                            ? undefined
+                            : {
+                                scale: [1, 1.12, 1],
+                                opacity: [0.5, 0.15, 0.5],
+                              }
+                        }
+                        transition={{
+                          duration: 2.8,
+                          repeat: Infinity,
+                          delay: index * 0.25,
+                          ease: 'easeInOut',
+                        }}
+                      />
+                      <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full border border-[#c5a059]/50 bg-[#f7f3eb] text-[#c5a059] shadow-[0_8px_24px_-12px_rgba(197,160,89,0.8)] transition-all duration-500 group-hover:border-[#c5a059] group-hover:bg-[#c5a059] group-hover:text-[#0c0c0c]">
+                        <Icon className="h-6 w-6" strokeWidth={1.25} />
                       </div>
-                      <p className="font-[family-name:var(--font-display)] text-xl text-[#0c0c0c] transition-colors group-hover:text-[#c5a059] md:text-2xl">
-                        {stop.label}
-                      </p>
-                      <p className="mt-1 text-[10px] font-semibold tracking-[0.18em] text-[#0c0c0c]/45 uppercase">
-                        {stop.detail}
-                      </p>
-                    </motion.div>
-                  );
-                })}
-              </div>
+                    </div>
+                    <p className="font-[family-name:var(--font-display)] text-2xl text-[#0c0c0c] transition-colors group-hover:text-[#c5a059] md:text-3xl">
+                      {stop.label}
+                    </p>
+                    <p className="mt-2 text-[11px] font-semibold tracking-[0.2em] text-[#0c0c0c]/50 uppercase">
+                      {stop.detail}
+                    </p>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
 
-          {/* Animated route map panel */}
           <motion.div
-            className="relative hidden min-h-[180px] w-full max-w-[240px] shrink-0 overflow-hidden rounded-xl border border-[#c5a059]/20 bg-[#0c0c0c] lg:block"
-            initial={reduce ? false : { opacity: 0, x: 24 }}
-            whileInView={reduce ? undefined : { opacity: 1, x: 0 }}
+            className="mt-12 md:mt-14"
+            initial={reduce ? false : { opacity: 0, y: 28 }}
+            whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.8, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(197,160,89,0.18),transparent_65%)]" />
-            <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:20px_20px]" />
-
-            <div className="relative flex h-full flex-col items-center justify-center p-6 text-center">
-              <p className="font-[family-name:var(--font-display)] text-3xl text-white">
-                {countryName}
-              </p>
-              <p className="mt-2 text-[10px] tracking-[0.22em] text-[#c5a059] uppercase">
-                Route map
-              </p>
-
-              <div className="mt-6 flex w-full max-w-[160px] items-center justify-between px-1">
-                {stops.map((s, i) => (
-                  <span key={s.label} className="relative flex flex-1 items-center">
-                    <motion.span
-                      className="relative z-10 h-2.5 w-2.5 rounded-full bg-[#c5a059] shadow-[0_0_12px_rgba(197,160,89,0.8)]"
-                      initial={reduce ? false : { scale: 0 }}
-                      whileInView={reduce ? undefined : { scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.7 + i * 0.12, type: 'spring', stiffness: 260 }}
-                    />
-                    {i < stops.length - 1 ? (
-                      <motion.span
-                        className="absolute top-1/2 left-[50%] h-px w-full origin-left -translate-y-1/2 bg-gradient-to-r from-[#c5a059] to-[#c5a059]/30"
-                        initial={reduce ? false : { scaleX: 0 }}
-                        whileInView={reduce ? undefined : { scaleX: 1 }}
-                        viewport={{ once: true }}
-                        transition={{
-                          delay: 0.75 + i * 0.12,
-                          duration: 0.45,
-                          ease: [0.22, 1, 0.36, 1],
-                        }}
-                      />
-                    ) : null}
-                  </span>
-                ))}
-              </div>
-
-              <motion.p
-                className="mt-5 text-[10px] tracking-[0.16em] text-white/40 uppercase"
-                initial={reduce ? false : { opacity: 0 }}
-                whileInView={reduce ? undefined : { opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 1.2 }}
-              >
-                {stops.length} curated stops
-              </motion.p>
-            </div>
+            <JourneyCountryMap
+              countryName={countryName}
+              stopLabels={stops.map((s) => s.label)}
+              className="min-h-[280px] md:min-h-[320px]"
+            />
           </motion.div>
         </div>
       </motion.div>
@@ -281,21 +252,30 @@ export function ItineraryPlaces({
                       {place.subtitle}
                     </p>
                   ) : null}
-                  <p className="mt-5 text-base leading-[1.8] text-[var(--color-ink)]/70">
+                  <p className="mt-5 text-base leading-[1.8] text-[var(--color-ink)]/70 md:text-lg">
                     {place.description}
                   </p>
-                  <ul className="mt-6 space-y-3">
-                    {place.highlights.map((h) => (
-                      <li
+                  <ul className="mt-8 space-y-0">
+                    {place.highlights.map((h, hi) => (
+                      <motion.li
                         key={h}
-                        className="flex items-start gap-3 text-sm text-[var(--color-ink)]"
+                        className="group flex items-start gap-4 border-b border-[#0c0c0c]/08 py-3.5 last:border-b-0"
+                        initial={{ opacity: 0, x: -16 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true, amount: 0.4 }}
+                        transition={{
+                          duration: 0.5,
+                          delay: 0.12 + hi * 0.08,
+                          ease: [0.22, 1, 0.36, 1],
+                        }}
                       >
-                        <Check
-                          className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-gold)]"
-                          strokeWidth={2}
-                        />
-                        {h}
-                      </li>
+                        <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#c5a059]/45 bg-[#c5a059]/10 text-[#c5a059] transition duration-300 group-hover:border-[#c5a059] group-hover:bg-[#c5a059] group-hover:text-[#0c0c0c]">
+                          <Check className="h-3.5 w-3.5" strokeWidth={2.25} />
+                        </span>
+                        <span className="pt-0.5 font-[family-name:var(--font-display)] text-[17px] leading-snug font-medium tracking-[0.01em] text-[#0c0c0c] transition-colors duration-300 group-hover:text-[#c5a059] md:text-[18px]">
+                          {h}
+                        </span>
+                      </motion.li>
                     ))}
                   </ul>
                 </FadeIn>

@@ -1597,6 +1597,33 @@ export const testimonials: DemoTestimonial[] = [
     tripLabel: 'Family Collection · Italy',
     rating: 5,
   },
+  {
+    id: 't4',
+    authorName: 'James R.',
+    authorLocation: 'New York',
+    quote:
+      'From the first call to the final transfer, everything felt seamless. Our guide in Kyoto was exceptional.',
+    tripLabel: 'Neon Cities & Ancient Souls',
+    rating: 5,
+  },
+  {
+    id: 't5',
+    authorName: 'Sofia & Luca',
+    authorLocation: 'Milan',
+    quote:
+      'The Amalfi boat day and Tuscan vineyard stay were highlights. Felt exclusive without being stuffy.',
+    tripLabel: 'Amalfi & Tuscany',
+    rating: 5,
+  },
+  {
+    id: 't6',
+    authorName: 'Elena V.',
+    authorLocation: 'Paris',
+    quote:
+      'Support was calm and instant when our flight shifted. That alone made the journey feel truly private.',
+    tripLabel: 'Morocco Soul Journey',
+    rating: 5,
+  },
 ];
 
 export const enquiries: DemoEnquiry[] = [

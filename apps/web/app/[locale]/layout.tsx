@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { OrganizationJsonLd } from '@/components/marketing/json-ld';
 import { PremiumPreloader } from '@/components/marketing/premium-preloader';
+import { CookieConsent } from '@/components/marketing/cookie-consent';
 import { Navbar } from '@/components/marketing/navbar';
 import { Footer } from '@/components/marketing/footer';
 import { getLocaleDirection, isValidLocale, type Locale } from '@/lib/i18n/config';
@@ -24,6 +25,7 @@ export default async function LocaleLayout({
       <Navbar locale={locale} />
       <main>{children}</main>
       <Footer locale={locale} />
+      <CookieConsent locale={locale} />
     </div>
   );
 }

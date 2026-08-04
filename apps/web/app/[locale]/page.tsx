@@ -9,8 +9,8 @@ import {
   BlogCard,
   CtaBand,
 } from '@/components/marketing/sections';
-import { NewsletterForm } from '@/components/forms/newsletter-form';
-import { FadeIn, LazySection } from '@/components/motion/fade-in';
+import { NewsletterBand } from '@/components/forms/newsletter-form';
+import { LazySection } from '@/components/motion/fade-in';
 import {
   destinationQueries,
   experienceQueries,
@@ -25,11 +25,15 @@ export default async function HomePage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const continents = destinationQueries.getContinents();
-  const experiences = experienceQueries.getFeatured().slice(0, 3);
-  const itineraries = itineraryQueries.getFeatured();
-  const posts = blogQueries.getFeatured();
-  const testimonials = testimonialQueries.getAll();
+  const [continents, featuredExperiences, itineraries, posts, testimonials] =
+    await Promise.all([
+      destinationQueries.getContinents(),
+      experienceQueries.getFeatured(),
+      itineraryQueries.getFeatured(),
+      blogQueries.getFeatured(),
+      testimonialQueries.getAll(),
+    ]);
+  const experiences = featuredExperiences.slice(0, 3);
 
   return (
     <>
@@ -144,22 +148,8 @@ export default async function HomePage({
         </div>
       </LazySection>
 
-      <LazySection className="border-t border-white/10 bg-[var(--color-charcoal)] px-6 py-20 lg:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-8 md:flex-row md:items-center">
-          <FadeIn direction="left" distance={32} blur>
-            <div>
-              <p className="text-xs tracking-[0.25em] text-[var(--color-gold)] uppercase">
-                Newsletter
-              </p>
-              <h2 className="mt-2 font-[family-name:var(--font-display)] text-4xl text-white">
-                Journey inspiration, quietly delivered
-              </h2>
-            </div>
-          </FadeIn>
-          <FadeIn direction="right" distance={32} delay={0.15}>
-            <NewsletterForm locale={locale} />
-          </FadeIn>
-        </div>
+      <LazySection>
+        <NewsletterBand locale={locale} />
       </LazySection>
 
       <CtaBand

@@ -4,7 +4,7 @@ import { hotelQueries } from '@/features/catalog/queries';
 export const metadata = { title: 'Hotels' };
 export default async function HotelsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const items = hotelQueries.getAll();
+  const items = await hotelQueries.getAll();
   return (
     <div className="bg-[var(--color-ink)] pt-28">
       <LazySection className="mx-auto max-w-7xl px-6 py-16 lg:px-8">

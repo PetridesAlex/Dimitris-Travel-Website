@@ -3,8 +3,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { FadeIn, ParallaxHeroMedia, TextReveal } from '@/components/motion/fade-in';
+import { cn } from '@/lib/utils';
 
 type HeroProps = {
   eyebrow?: string;
@@ -18,6 +20,50 @@ type HeroProps = {
   scriptEyebrow?: boolean;
   tall?: boolean;
 };
+
+function HeroPrimaryCta({ label, href }: { label: string; href: string }) {
+  const reduce = useReducedMotion();
+
+  return (
+    <Link
+      href={href}
+      className={cn(
+        'group relative inline-flex h-12 min-w-[220px] items-center justify-center overflow-hidden px-8',
+        'text-[12px] font-semibold tracking-[0.2em] text-[#0c0c0c] uppercase',
+        'shadow-[0_16px_40px_-16px_rgba(197,160,89,0.95)]',
+      )}
+    >
+      <span
+        aria-hidden
+        className="absolute inset-0 bg-gradient-to-r from-[#a8863f] via-[#c5a059] to-[#d4b56e]"
+      />
+      {!reduce ? (
+        <motion.span
+          aria-hidden
+          className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-transparent via-white/40 to-transparent"
+          animate={{ x: ['-100%', '100%'] }}
+          transition={{
+            duration: 2.2,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            repeatDelay: 0.9,
+          }}
+        />
+      ) : null}
+      <span
+        aria-hidden
+        className="absolute inset-0 origin-left scale-x-0 bg-gradient-to-r from-[#8f7132] via-[#b8923f] to-[#c5a059] transition-transform duration-500 ease-out group-hover:scale-x-100"
+      />
+      <span className="relative z-10 inline-flex items-center gap-2.5">
+        {label}
+        <ArrowRight
+          className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+          strokeWidth={1.75}
+        />
+      </span>
+    </Link>
+  );
+}
 
 export function Hero({
   eyebrow,
@@ -43,7 +89,7 @@ export function Hero({
           alt={imageAlt || title}
           fill
           priority
-          className="object-cover"
+          className="scale-105 object-cover"
           sizes="100vw"
         />
       </ParallaxHeroMedia>
@@ -87,12 +133,7 @@ export function Hero({
           <FadeIn delay={0.5} direction="up" distance={20}>
             <div className="mt-8 flex flex-wrap gap-4">
               {primaryCta ? (
-                <Button asChild size="lg">
-                  <Link href={primaryCta.href}>
-                    {primaryCta.label}
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
+                <HeroPrimaryCta label={primaryCta.label} href={primaryCta.href} />
               ) : null}
               {secondaryCta ? (
                 <Button asChild variant="outline" size="lg">

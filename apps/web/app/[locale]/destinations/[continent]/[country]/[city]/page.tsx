@@ -27,8 +27,8 @@ type Props = {
 };
 
 export async function generateStaticParams() {
-  return destinationQueries
-    .getAll()
+  const all = await destinationQueries.getAll();
+  return all
     .filter((d) => d.type === 'city')
     .map((c) => {
       const [continent, country, city] = c.slugPath.split('/');
@@ -39,7 +39,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props) {
   const { continent, country, city } = await params;
-  const dest = destinationQueries.getBySlugPath(
+  const dest = await destinationQueries.getBySlugPath(
     `${continent}/${country}/${city}`,
   );
   if (!dest) return {};
@@ -48,15 +48,17 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function CityPage({ params }: Props) {
   const { locale, continent, country, city } = await params;
-  const dest = destinationQueries.getBySlugPath(
+  const dest = await destinationQueries.getBySlugPath(
     `${continent}/${country}/${city}`,
   );
   if (!dest || dest.type !== 'city') notFound();
 
-  const countryDest = destinationQueries.getBySlugPath(`${continent}/${country}`);
-  const continentDest = destinationQueries.getBySlugPath(continent);
-  const hotels = hotelQueries.getByDestination(dest.id);
-  const itineraries = itineraryQueries.getByDestination(dest.id);
+  const [countryDest, continentDest, hotels, itineraries] = await Promise.all([
+    destinationQueries.getBySlugPath(`${continent}/${country}`),
+    destinationQueries.getBySlugPath(continent),
+    hotelQueries.getByDestination(dest.id),
+    itineraryQueries.getByDestination(dest.id),
+  ]);
 
   return (
     <>

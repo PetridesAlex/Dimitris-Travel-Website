@@ -1,46 +1,90 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AdminPageHeader, DataTable } from '@/components/admin/page-header';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
+import { CmsForm, TextInput, Select } from '@/components/admin/cms-form';
+import {
+  deleteRedirectAction,
+  saveRedirectAction,
+  saveSeoDefaultsAction,
+} from '@/features/cms/actions';
+import { createServiceClient } from '@/lib/supabase/server';
 
-const redirects = [
-  { from: '/japan', to: '/en/destinations/asia/japan', code: 301 },
-  { from: '/morocco-tours', to: '/en/destinations/africa/morocco', code: 301 },
-];
+export default async function AdminSeoPage() {
+  const db = createServiceClient();
+  let titleTemplate = '%s | Uncharted Journeys';
+  let description = 'Tailor-made luxury journeys around the world.';
+  let redirects: { id: string; from_path: string; to_path: string; status_code: number }[] =
+    [];
 
-export default function AdminSeoPage() {
+  if (db) {
+    const { data: seo } = await (db as any)
+      .from('seo_defaults')
+      .select('title_template, default_meta_description')
+      .eq('locale', 'en')
+      .maybeSingle();
+    if (seo) {
+      titleTemplate = seo.title_template || titleTemplate;
+      description = seo.default_meta_description || description;
+    }
+    const { data: rows } = await (db as any)
+      .from('redirects')
+      .select('id, from_path, to_path, status_code')
+      .order('from_path');
+    redirects = rows || [];
+  }
+
   return (
     <div>
-      <AdminPageHeader title="SEO" description="Defaults, redirects, and templates. Per-entity SEO lives on translation forms." />
-      <div className="mb-8 grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader><CardTitle>SEO defaults</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Title template</Label>
-              <Input defaultValue="%s | Uncharted Journeys" />
-            </div>
-            <div className="space-y-2">
-              <Label>Default meta description</Label>
-              <Input defaultValue="Tailor-made luxury journeys around the world." />
-            </div>
-            <Button variant="admin">Save defaults</Button>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader><CardTitle>Structured data</CardTitle></CardHeader>
-          <CardContent className="text-sm text-[var(--admin-muted)] space-y-2">
-            <p>Automatic JSON-LD for TravelAgency, TouristDestination, TouristTrip, Article, BreadcrumbList, FAQPage.</p>
-            <p>Sitemap: /sitemap.xml · Robots: /robots.txt</p>
-          </CardContent>
-        </Card>
-      </div>
-      <h2 className="mb-4 text-lg font-semibold">Redirects</h2>
-      <DataTable
-        columns={['From', 'To', 'Code']}
-        rows={redirects.map((r) => [r.from, r.to, String(r.code)])}
+      <AdminPageHeader
+        title="SEO"
+        description="Defaults, redirects, and templates. Per-entity SEO lives on translation forms."
       />
+      <div className="mb-8 grid gap-6 lg:grid-cols-2">
+        <div className="rounded-lg border border-[var(--admin-border)] bg-white p-6">
+          <h2 className="mb-4 text-base font-semibold">SEO defaults</h2>
+          <CmsForm action={saveSeoDefaultsAction} submitLabel="Save defaults">
+            <TextInput name="titleTemplate" label="Title template" defaultValue={titleTemplate} />
+            <TextInput name="description" label="Default meta description" defaultValue={description} />
+          </CmsForm>
+        </div>
+        <div className="rounded-lg border border-[var(--admin-border)] bg-white p-6">
+          <h2 className="mb-4 text-base font-semibold">Add redirect</h2>
+          <CmsForm action={saveRedirectAction} submitLabel="Add redirect">
+            <TextInput name="from" label="From path" placeholder="/old-path" required />
+            <TextInput name="to" label="To path" placeholder="/en/destinations/asia" required />
+            <Select
+              name="code"
+              label="Status code"
+              defaultValue="301"
+              options={[
+                { value: '301', label: '301' },
+                { value: '302', label: '302' },
+              ]}
+            />
+          </CmsForm>
+        </div>
+      </div>
+
+      <h2 className="mb-4 text-lg font-semibold">Redirects</h2>
+      {redirects.length === 0 ? (
+        <p className="text-sm text-[var(--admin-muted)]">No redirects yet.</p>
+      ) : (
+        <DataTable
+          columns={['From', 'To', 'Code', '']}
+          rows={redirects.map((r) => [
+            r.from_path,
+            r.to_path,
+            String(r.status_code),
+            <CmsForm
+              key={r.id}
+              action={deleteRedirectAction}
+              submitLabel="Delete"
+              className="!space-y-0"
+            >
+              <input type="hidden" name="id" value={r.id} />
+            </CmsForm>,
+          ])}
+        />
+      )}
     </div>
   );
 }

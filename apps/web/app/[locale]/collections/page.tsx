@@ -6,7 +6,7 @@ export const metadata = { title: 'Special Collections' };
 
 export default async function CollectionsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const items = collectionQueries.getAll();
+  const items = await collectionQueries.getAll();
   return (
     <div className="bg-[var(--color-ink)] pt-28">
       <LazySection className="mx-auto max-w-7xl px-6 py-16 lg:px-8">

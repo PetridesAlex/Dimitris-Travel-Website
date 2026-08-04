@@ -11,19 +11,20 @@ import { itineraryQueries } from '@/features/catalog/queries';
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
 export async function generateStaticParams() {
-  return itineraryQueries.getAll().map((i) => ({ slug: i.slug }));
+  const all = await itineraryQueries.getAll();
+  return all.map((i) => ({ slug: i.slug }));
 }
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const itin = itineraryQueries.getBySlug(slug);
+  const itin = await itineraryQueries.getBySlug(slug);
   if (!itin) return {};
   return { title: itin.title, description: itin.summary };
 }
 
 export default async function ItineraryDetailPage({ params }: Props) {
   const { locale, slug } = await params;
-  const itin = itineraryQueries.getBySlug(slug);
+  const itin = await itineraryQueries.getBySlug(slug);
   if (!itin) notFound();
 
   const jsonLd = {

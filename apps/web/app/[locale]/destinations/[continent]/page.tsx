@@ -26,14 +26,13 @@ type Props = {
 };
 
 export async function generateStaticParams() {
-  return destinationQueries
-    .getContinents()
-    .map((c) => ({ continent: c.slug }));
+  const continents = await destinationQueries.getContinents();
+  return continents.map((c) => ({ continent: c.slug }));
 }
 
 export async function generateMetadata({ params }: Props) {
   const { continent } = await params;
-  const dest = destinationQueries.getBySlugPath(continent);
+  const dest = await destinationQueries.getBySlugPath(continent);
   if (!dest) return {};
   return {
     title: dest.name,
@@ -44,12 +43,16 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function ContinentPage({ params }: Props) {
   const { locale, continent } = await params;
-  const dest = destinationQueries.getBySlugPath(continent);
+  const dest = await destinationQueries.getBySlugPath(continent);
   if (!dest || dest.type !== 'continent') notFound();
 
-  const children = destinationQueries.getChildren(dest.id);
-  const experiences = experienceQueries.getFeatured().slice(0, 3);
-  const itineraries = itineraryQueries.getFeatured().slice(0, 3);
+  const [children, featuredExperiences, featuredItineraries] = await Promise.all([
+    destinationQueries.getChildren(dest.id),
+    experienceQueries.getFeatured(),
+    itineraryQueries.getFeatured(),
+  ]);
+  const experiences = featuredExperiences.slice(0, 3);
+  const itineraries = featuredItineraries.slice(0, 3);
 
   return (
     <>
@@ -100,7 +103,7 @@ export default async function ContinentPage({ params }: Props) {
               { label: 'Visa', value: dest.visaInfo },
             ]}
             action={
-              <Button asChild variant="dark" size="lg">
+              <Button asChild size="lg">
                 <Link href={`/${locale}/plan-your-journey`}>Practical Info</Link>
               </Button>
             }

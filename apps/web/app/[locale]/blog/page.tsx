@@ -4,7 +4,7 @@ import { blogQueries } from '@/features/catalog/queries';
 export const metadata = { title: 'Inspiration' };
 export default async function BlogPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const posts = blogQueries.getAll();
+  const posts = await blogQueries.getAll();
   return (
     <div className="bg-[var(--color-ink)] pt-28">
       <LazySection className="mx-auto max-w-7xl px-6 py-16 lg:px-8">

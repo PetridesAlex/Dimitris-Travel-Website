@@ -3,19 +3,30 @@ import { AdminPageHeader, DataTable, StatusBadge } from '@/components/admin/page
 import { formatCurrency } from '@/lib/utils';
 import { itineraryQueries } from '@/features/catalog/queries';
 
-export default function AdminItinerariesPage() {
-  const items = itineraryQueries.getAll();
+export default async function AdminItinerariesPage() {
+  const items = await itineraryQueries.getAll();
   return (
     <div>
-      <AdminPageHeader title="Itineraries" description="Day-by-day signature journeys." action={{ label: 'New itinerary', href: '#' }} />
+      <AdminPageHeader
+        title="Itineraries"
+        description="Day-by-day signature journeys."
+        action={{ label: 'New itinerary', href: '/admin/itineraries/new' }}
+      />
       <DataTable
         columns={['Title', 'Duration', 'From', 'Status', '']}
         rows={items.map((i) => [
           <span key="n" className="font-medium">{i.title}</span>,
           `${i.durationDays} days`,
           formatCurrency(i.priceFrom, i.currency),
-          <StatusBadge key="s" status="published" />,
-          <Link key="l" className="text-[var(--color-gold-dark)]" href={`/en/itineraries/${i.slug}`}>View</Link>,
+          <StatusBadge key="s" status={(i as { status?: string }).status || 'published'} />,
+          <span key="l" className="flex gap-3">
+            <Link className="text-[var(--color-gold-dark)]" href={`/admin/itineraries/${i.id}`}>
+              Edit
+            </Link>
+            <Link className="text-[var(--admin-muted)]" href={`/en/itineraries/${i.slug}`}>
+              View
+            </Link>
+          </span>,
         ])}
       />
     </div>

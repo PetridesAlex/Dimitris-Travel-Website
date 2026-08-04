@@ -1,32 +1,35 @@
-'use client';
+import { getCmsSession } from '@/lib/cms/auth';
+import { isDemoMode } from '@/lib/supabase/server';
+import { enquiryQueries } from '@/features/catalog/queries';
+import { AdminTopbarClient } from '@/components/admin/topbar-client';
 
-import Link from 'next/link';
-import { Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+export async function AdminTopbar() {
+  const session = await getCmsSession();
+  const demo = isDemoMode();
+  const enquiries = await enquiryQueries.getAll();
+  const enquiryCount = enquiries.filter(
+    (e) => e.status === 'new' || e.status === 'contacted',
+  ).length;
 
-export function AdminTopbar() {
+  const name = session?.name || session?.email || 'Admin';
+  const email = session?.email || '';
+  const role = session?.role || 'editor';
+  const initials =
+    name
+      .split(/\s|@/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((p) => p[0]?.toUpperCase() || '')
+      .join('') || 'A';
+
   return (
-    <header className="flex h-16 items-center justify-between border-b border-[var(--admin-border)] bg-white px-6">
-      <div className="relative w-full max-w-md">
-        <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-[var(--admin-muted)]" />
-        <Input
-          placeholder="Search destinations, hotels, media…"
-          className="pl-9"
-        />
-      </div>
-      <div className="flex items-center gap-3">
-        <Badge>Demo Mode</Badge>
-        <Link
-          href="/en"
-          className="text-sm text-[var(--admin-muted)] hover:text-[var(--admin-text)]"
-        >
-          View site
-        </Link>
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-gold)] text-sm font-semibold text-[var(--color-ink)]">
-          SA
-        </div>
-      </div>
-    </header>
+    <AdminTopbarClient
+      email={email}
+      name={name}
+      initials={initials}
+      role={role}
+      demo={demo}
+      enquiryCount={enquiryCount}
+    />
   );
 }

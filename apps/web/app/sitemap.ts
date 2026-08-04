@@ -11,7 +11,7 @@ import { LOCALES } from '@/lib/i18n/config';
 
 const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPaths = [
     '',
     '/destinations',
@@ -25,6 +25,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/plan-your-journey',
   ];
 
+  const [
+    destinations,
+    experiences,
+    hotels,
+    itineraries,
+    collections,
+    posts,
+  ] = await Promise.all([
+    destinationQueries.getAll(),
+    experienceQueries.getAll(),
+    hotelQueries.getAll(),
+    itineraryQueries.getAll(),
+    collectionQueries.getAll(),
+    blogQueries.getAll(),
+  ]);
+
   const entries: MetadataRoute.Sitemap = [];
 
   for (const locale of LOCALES) {
@@ -37,7 +53,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       });
     }
 
-    for (const d of destinationQueries.getAll()) {
+    for (const d of destinations) {
       entries.push({
         url: `${base}/${locale}/destinations/${d.slugPath}`,
         lastModified: new Date(),
@@ -45,7 +61,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.8,
       });
     }
-    for (const e of experienceQueries.getAll()) {
+    for (const e of experiences) {
       entries.push({
         url: `${base}/${locale}/experiences/${e.slug}`,
         lastModified: new Date(),
@@ -53,7 +69,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.6,
       });
     }
-    for (const h of hotelQueries.getAll()) {
+    for (const h of hotels) {
       entries.push({
         url: `${base}/${locale}/hotels/${h.slug}`,
         lastModified: new Date(),
@@ -61,7 +77,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.6,
       });
     }
-    for (const i of itineraryQueries.getAll()) {
+    for (const i of itineraries) {
       entries.push({
         url: `${base}/${locale}/itineraries/${i.slug}`,
         lastModified: new Date(),
@@ -69,7 +85,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.7,
       });
     }
-    for (const c of collectionQueries.getAll()) {
+    for (const c of collections) {
       entries.push({
         url: `${base}/${locale}/collections/${c.slug}`,
         lastModified: new Date(),
@@ -77,7 +93,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.6,
       });
     }
-    for (const p of blogQueries.getAll()) {
+    for (const p of posts) {
       entries.push({
         url: `${base}/${locale}/blog/${p.slug}`,
         lastModified: new Date(p.publishedAt),
