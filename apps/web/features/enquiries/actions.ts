@@ -45,8 +45,9 @@ export async function submitEnquiry(input: z.infer<typeof enquirySchema>) {
     };
 
     // Prefer service role (server-validated) so public forms work even if anon RLS/grants are tight.
-    const service = createServiceClient();
-    const client = service ?? createAnonClient();
+    // Untyped client: loose Database schema makes .insert() infer `never`.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const client = (createServiceClient() ?? createAnonClient()) as any;
     if (client) {
       const { error } = await client.from('enquiries').insert(row);
       if (error) {
@@ -70,8 +71,8 @@ export async function subscribeNewsletter(email: string, locale = 'en') {
   const parsed = z.string().email().parse(email);
 
   if (!isDemoMode()) {
-    const service = createServiceClient();
-    const client = service ?? createAnonClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const client = (createServiceClient() ?? createAnonClient()) as any;
     if (client) {
       const { error } = await client.from('newsletter_subscribers').upsert({
         email: parsed,
