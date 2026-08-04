@@ -27,6 +27,28 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Hold the site behind the preloader on first paint */
+html.uj-booting {
+  background: #030303;
+}
+
+html.uj-booting [data-site-shell] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+html:not(.uj-booting) [data-site-shell] {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Returning visitors: skip splash before React hydrates */
+html[data-uj-ready] [data-uj-preloader] {
+  display: none !important;
+}
+
 a {
   color: inherit;
   text-decoration: none;

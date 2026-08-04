@@ -21,11 +21,13 @@ export default async function LocaleLayout({
   return (
     <div lang={locale} dir={dir}>
       <PremiumPreloader />
-      <OrganizationJsonLd />
-      <Navbar locale={locale} />
-      <main>{children}</main>
-      <Footer locale={locale} />
-      <CookieConsent locale={locale} />
+      <div data-site-shell>
+        <OrganizationJsonLd />
+        <Navbar locale={locale} />
+        <main>{children}</main>
+        <Footer locale={locale} />
+        <CookieConsent locale={locale} />
+      </div>
     </div>
   );
 }

@@ -43,19 +43,20 @@ export function ItineraryHero({
   locale: string;
 }) {
   return (
-    <section className="relative bg-[var(--color-cream)] px-6 pb-10 pt-28 lg:px-8 lg:pt-32">
+    <section className="relative z-10 bg-[var(--color-cream)] px-6 pb-10 pt-28 lg:px-8 lg:pt-32">
       <div className="mx-auto max-w-5xl text-center">
+        <Link
+          href={`/${locale}/itineraries`}
+          className="group relative z-20 mb-10 inline-flex items-center gap-3 border border-[#c5a059]/50 bg-white px-5 py-2.5 text-[13px] font-semibold tracking-[0.2em] text-[#0c0c0c] uppercase shadow-[0_10px_30px_-18px_rgba(12,12,12,0.35)] transition duration-300 hover:border-[#c5a059] hover:bg-[#c5a059] hover:text-[#0c0c0c]"
+        >
+          <ArrowLeft
+            className="h-4 w-4 shrink-0 text-[#c5a059] transition duration-300 group-hover:text-[#0c0c0c]"
+            strokeWidth={2}
+          />
+          Back to all journeys
+        </Link>
+
         <FadeIn direction="up" blur>
-          <Link
-            href={`/${locale}/itineraries`}
-            className="group mb-10 inline-flex items-center gap-3 border border-[#c5a059]/40 bg-white/70 px-5 py-2.5 text-[13px] font-semibold tracking-[0.2em] text-[#0c0c0c] uppercase shadow-[0_10px_30px_-18px_rgba(12,12,12,0.35)] transition duration-300 hover:border-[#c5a059] hover:bg-[#c5a059] hover:text-[#0c0c0c]"
-          >
-            <ArrowLeft
-              className="h-4 w-4 text-[#c5a059] transition duration-300 group-hover:text-[#0c0c0c]"
-              strokeWidth={2}
-            />
-            Back to all journeys
-          </Link>
           <h1 className="font-[family-name:var(--font-display)] text-4xl leading-[1.1] text-[var(--color-ink)] md:text-6xl lg:text-7xl">
             {itinerary.title}
           </h1>

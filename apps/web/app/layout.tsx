@@ -48,6 +48,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(sessionStorage.getItem('uj-preloader-seen')==='1'){document.documentElement.setAttribute('data-uj-ready','1')}else{document.documentElement.classList.add('uj-booting')}}catch(e){document.documentElement.classList.add('uj-booting')}})();`,
+          }}
+        />
+      </head>
       <body
         className={`${display.variable} ${body.variable} ${script.variable} antialiased`}
       >

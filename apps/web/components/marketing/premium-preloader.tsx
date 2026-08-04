@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 
 const SESSION_KEY = 'uj-preloader-seen';
 const DURATION_MS = 3200;
+const BOOT_CLASS = 'uj-booting';
 
 const phrases = [
   'Beyond destinations',
@@ -12,24 +13,48 @@ const phrases = [
   'Crafted for you',
 ];
 
+function shouldSkipPreloader(reduce: boolean | null) {
+  if (reduce) return true;
+  try {
+    return sessionStorage.getItem(SESSION_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function lockBoot() {
+  document.documentElement.classList.add(BOOT_CLASS);
+  document.body.style.overflow = 'hidden';
+}
+
+function unlockBoot() {
+  document.documentElement.classList.remove(BOOT_CLASS);
+  document.body.style.overflow = '';
+}
+
 export function PremiumPreloader() {
   const reduce = useReducedMotion();
-  const [visible, setVisible] = useState(false);
+  // Start covered so the site never paints first during hydration.
+  const [visible, setVisible] = useState(true);
   const [progress, setProgress] = useState(0);
   const [phraseIndex, setPhraseIndex] = useState(0);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const seen = sessionStorage.getItem(SESSION_KEY);
-    if (seen || reduce) {
+  useLayoutEffect(() => {
+    if (shouldSkipPreloader(reduce)) {
       setVisible(false);
+      unlockBoot();
       return;
     }
 
+    lockBoot();
     setVisible(true);
-    document.body.style.overflow = 'hidden';
+  }, [reduce]);
 
+  useEffect(() => {
+    if (!visible) return;
+    if (shouldSkipPreloader(reduce)) return;
+
+    lockBoot();
     const start = performance.now();
     let frame = 0;
 
@@ -49,23 +74,32 @@ export function PremiumPreloader() {
 
     const timer = window.setTimeout(() => {
       setVisible(false);
-      sessionStorage.setItem(SESSION_KEY, '1');
-      document.body.style.overflow = '';
+      try {
+        sessionStorage.setItem(SESSION_KEY, '1');
+      } catch {
+        /* ignore */
+      }
+      // Unlock after the exit animation begins so the site fades in underneath.
+      window.setTimeout(() => unlockBoot(), 280);
     }, DURATION_MS + 650);
 
     return () => {
       cancelAnimationFrame(frame);
       window.clearInterval(phraseTimer);
       window.clearTimeout(timer);
-      document.body.style.overflow = '';
     };
-  }, [reduce]);
+  }, [visible, reduce]);
 
   return (
-    <AnimatePresence>
+    <AnimatePresence
+      onExitComplete={() => {
+        unlockBoot();
+      }}
+    >
       {visible ? (
         <motion.div
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden bg-[#030303]"
+          data-uj-preloader
+          className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden bg-[#030303]"
           initial={{ opacity: 1 }}
           exit={{
             opacity: 0,
