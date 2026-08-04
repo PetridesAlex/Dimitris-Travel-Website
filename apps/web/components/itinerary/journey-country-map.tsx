@@ -74,7 +74,7 @@ function parseViewBox(viewBox: string) {
   return { minX, minY, width, height };
 }
 
-/** Fan labels away from markers so city names stay readable. */
+/** Fan labels away from markers so city names stay readable (desktop SVG labels). */
 function placeLabels(stops: MapStop[], viewBox: string): LabeledStop[] {
   const vb = parseViewBox(viewBox);
   const candidates: Array<{ dx: number; dy: number; anchor: LabeledStop['anchor'] }> = [
@@ -185,30 +185,40 @@ export function JourneyCountryMap({
   return (
     <div
       className={cn(
-        'relative overflow-hidden border border-[#c5a059]/35 bg-[#0c0c0c]',
+        'relative w-full min-w-0 overflow-hidden border border-[#c5a059]/35 bg-[#0c0c0c]',
         className,
       )}
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(197,160,89,0.16),transparent_55%)]" />
       <div className="pointer-events-none absolute inset-0 opacity-[0.18] [background-image:linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] [background-size:18px_18px]" />
 
-      <div className="relative flex flex-col p-5 sm:p-6 md:p-7">
-        <div className="mb-4 flex items-end justify-between gap-4">
-          <div>
+      <div className="relative flex w-full min-w-0 flex-col p-4 sm:p-6 md:p-7">
+        <div className="mb-3 flex items-end justify-between gap-3 sm:mb-4 sm:gap-4">
+          <div className="min-w-0">
             <p className="text-[10px] font-semibold tracking-[0.28em] text-[#c5a059] uppercase">
               Route map
             </p>
-            <p className="mt-1 font-[family-name:var(--font-display)] text-2xl text-white md:text-3xl">
+            <p className="mt-1 truncate font-[family-name:var(--font-display)] text-xl text-white sm:text-2xl md:text-3xl">
               {countryName}
             </p>
           </div>
-          <p className="pb-1 text-[10px] tracking-[0.18em] text-white/40 uppercase">
-            {stops.length} curated stops
+          <p className="shrink-0 pb-0.5 text-[9px] tracking-[0.16em] text-white/40 uppercase sm:text-[10px] sm:tracking-[0.18em]">
+            {stops.length} stops
           </p>
         </div>
 
-        {/* Explicit height so the full SVG viewBox is always visible */}
-        <div className="relative w-full overflow-visible" style={{ aspectRatio: '5 / 4' }}>
+        {/*
+          Mobile: taller portrait frame so island/country shapes stay readable.
+          Desktop: wider landscape frame.
+        */}
+        <div
+          className={cn(
+            'relative w-full min-w-0 overflow-hidden bg-black/20',
+            'h-[min(62vw,340px)] min-h-[260px]',
+            'sm:h-[min(48vw,380px)] sm:min-h-[300px]',
+            'md:aspect-[5/4] md:h-auto md:min-h-[360px]',
+          )}
+        >
           <svg
             viewBox={config.viewBox}
             className="absolute inset-0 h-full w-full"
@@ -243,9 +253,9 @@ export function JourneyCountryMap({
 
             <motion.path
               d={config.path}
-              fill="rgba(197,160,89,0.18)"
-              stroke="rgba(197,160,89,0.85)"
-              strokeWidth={1.1}
+              fill="rgba(197,160,89,0.22)"
+              stroke="rgba(197,160,89,0.95)"
+              strokeWidth={1.4}
               initial={reduce ? false : { opacity: 0 }}
               whileInView={reduce ? undefined : { opacity: 1 }}
               viewport={{ once: true }}
@@ -257,10 +267,10 @@ export function JourneyCountryMap({
                 d={line}
                 fill="none"
                 stroke={`url(#${gradientId})`}
-                strokeWidth={1.6}
+                strokeWidth={2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeDasharray="4 5"
+                strokeDasharray="5 6"
                 initial={reduce ? false : { pathLength: 0, opacity: 0 }}
                 whileInView={reduce ? undefined : { pathLength: 1, opacity: 1 }}
                 viewport={{ once: true }}
@@ -271,21 +281,22 @@ export function JourneyCountryMap({
             {labeled.map((stop, index) => {
               const title = `${String(index + 1).padStart(2, '0')} ${stop.label}`;
               const needsLeader = Math.hypot(stop.lx - stop.x, stop.ly - stop.y) > 16;
+              const n = String(index + 1);
 
               return (
                 <g key={`${stop.label}-${index}`}>
                   <motion.circle
                     cx={stop.x}
                     cy={stop.y}
-                    r={9}
+                    r={14}
                     fill="none"
                     stroke="#c5a059"
-                    strokeWidth={0.7}
+                    strokeWidth={0.9}
                     initial={reduce ? false : { opacity: 0 }}
                     whileInView={
                       reduce
                         ? undefined
-                        : { opacity: [0.55, 0.12, 0.55], scale: [1, 1.3, 1] }
+                        : { opacity: [0.55, 0.12, 0.55], scale: [1, 1.25, 1] }
                     }
                     viewport={{ once: false }}
                     transition={{
@@ -299,7 +310,7 @@ export function JourneyCountryMap({
                   <motion.circle
                     cx={stop.x}
                     cy={stop.y}
-                    r={4.2}
+                    r={7.5}
                     fill="#c5a059"
                     filter={`url(#${glowId})`}
                     initial={reduce ? false : { scale: 0, opacity: 0 }}
@@ -313,51 +324,73 @@ export function JourneyCountryMap({
                     }}
                     style={{ transformOrigin: `${stop.x}px ${stop.y}px` }}
                   />
-                  <circle cx={stop.x} cy={stop.y} r={1.5} fill="#0c0c0c" />
-
-                  {needsLeader ? (
-                    <line
-                      x1={stop.x}
-                      y1={stop.y}
-                      x2={stop.lx}
-                      y2={stop.ly - 2}
-                      stroke="rgba(197,160,89,0.45)"
-                      strokeWidth={0.7}
-                    />
-                  ) : null}
-
+                  {/* Number inside marker — readable when SVG labels are hidden on mobile */}
                   <text
-                    x={stop.lx}
-                    y={stop.ly}
-                    fill="#f7f3eb"
-                    fontSize={11}
-                    fontWeight={600}
-                    letterSpacing="0.04em"
-                    textAnchor={stop.anchor}
-                    stroke="#0c0c0c"
-                    strokeWidth={3.2}
-                    paintOrder="stroke"
-                    strokeLinejoin="round"
+                    x={stop.x}
+                    y={stop.y + 3.5}
+                    textAnchor="middle"
+                    fill="#0c0c0c"
+                    fontSize={9}
+                    fontWeight={700}
+                    style={{ pointerEvents: 'none' }}
                   >
-                    {title}
+                    {n}
                   </text>
+
+                  {/* Desktop-only SVG city labels; legend covers mobile */}
+                  <g className="hidden md:block" aria-hidden>
+                    {needsLeader ? (
+                      <line
+                        x1={stop.x}
+                        y1={stop.y}
+                        x2={stop.lx}
+                        y2={stop.ly - 2}
+                        stroke="rgba(197,160,89,0.45)"
+                        strokeWidth={0.7}
+                      />
+                    ) : null}
+                    <text
+                      x={stop.lx}
+                      y={stop.ly}
+                      fill="#f7f3eb"
+                      fontSize={12}
+                      fontWeight={600}
+                      letterSpacing="0.04em"
+                      textAnchor={stop.anchor}
+                      stroke="#0c0c0c"
+                      strokeWidth={3.2}
+                      paintOrder="stroke"
+                      strokeLinejoin="round"
+                    >
+                      {title}
+                    </text>
+                  </g>
                 </g>
               );
             })}
           </svg>
         </div>
 
-        {/* Accessible stop list — avoids relying only on clipped SVG labels */}
-        <ol className="mt-5 grid gap-2 border-t border-white/10 pt-4 sm:grid-cols-3">
+        {/* Primary labels on mobile — horizontal scroll chips; grid on larger screens */}
+        <ol
+          className={cn(
+            'mt-4 flex gap-2 border-t border-white/10 pt-4',
+            '-mx-4 overflow-x-auto px-4 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+            'sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0',
+            'md:grid-cols-3 lg:grid-cols-5',
+          )}
+        >
           {stops.map((stop, index) => (
             <li
               key={`${stop.label}-${index}`}
-              className="flex items-center gap-2.5 text-sm text-white/75"
+              className="flex shrink-0 items-center gap-2.5 border border-[#c5a059]/35 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85 sm:min-w-0"
             >
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center border border-[#c5a059] font-[family-name:var(--font-display)] text-xs text-[#c5a059]">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center border border-[#c5a059] bg-[#0c0c0c] font-[family-name:var(--font-display)] text-xs font-semibold text-[#c5a059]">
                 {String(index + 1).padStart(2, '0')}
               </span>
-              <span className="font-medium tracking-wide">{stop.label}</span>
+              <span className="whitespace-nowrap font-medium tracking-wide sm:truncate">
+                {stop.label}
+              </span>
             </li>
           ))}
         </ol>

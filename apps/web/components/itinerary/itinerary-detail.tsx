@@ -200,7 +200,7 @@ export function JourneyAtAGlance({
           </div>
 
           <motion.div
-            className="mt-12 md:mt-14"
+            className="mt-10 w-full min-w-0 md:mt-14"
             initial={reduce ? false : { opacity: 0, y: 28 }}
             whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -209,7 +209,7 @@ export function JourneyAtAGlance({
             <JourneyCountryMap
               countryName={countryName}
               stopLabels={stops.map((s) => s.label)}
-              className="w-full"
+              className="w-full min-w-0"
             />
           </motion.div>
         </div>
