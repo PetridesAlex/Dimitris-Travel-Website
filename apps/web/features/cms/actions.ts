@@ -382,11 +382,24 @@ export async function saveItinerary(formData: FormData): Promise<ActionResult> {
     const placesRaw = str(formData, 'places');
     const glanceRaw = str(formData, 'glanceStops');
     const extensionsRaw = str(formData, 'extensions');
+    const daysRaw = str(formData, 'days');
     const countryName = str(formData, 'countryName');
     const placesLabel = str(formData, 'placesLabel') || 'Places';
+    const flights = list(formData, 'flights');
+    const departureDates = list(formData, 'departureDates');
+    const terms = list(formData, 'terms');
+    const days = daysRaw ? parseJsonField(daysRaw, []) : [];
 
     const hasComplex =
-      placesRaw || glanceRaw || extensionsRaw || countryName || placesLabel !== 'Places';
+      placesRaw ||
+      glanceRaw ||
+      extensionsRaw ||
+      daysRaw ||
+      flights.length > 0 ||
+      departureDates.length > 0 ||
+      terms.length > 0 ||
+      countryName ||
+      placesLabel !== 'Places';
 
     const included = hasComplex
       ? {
@@ -394,6 +407,10 @@ export async function saveItinerary(formData: FormData): Promise<ActionResult> {
           places: parseJsonField(placesRaw, []),
           glanceStops: parseJsonField(glanceRaw, []),
           extensions: parseJsonField(extensionsRaw, []),
+          days,
+          flights,
+          departureDates,
+          terms,
           countryName,
           placesLabel,
         }

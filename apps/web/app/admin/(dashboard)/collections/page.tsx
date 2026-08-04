@@ -3,7 +3,7 @@ import { AdminPageHeader, DataTable, StatusBadge } from '@/components/admin/page
 import { collectionQueries } from '@/features/catalog/queries';
 
 export default async function AdminCollectionsPage() {
-  const items = await collectionQueries.getAll();
+  const items = await collectionQueries.adminGetAll();
   return (
     <div>
       <AdminPageHeader

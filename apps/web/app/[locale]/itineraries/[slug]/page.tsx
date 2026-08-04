@@ -3,7 +3,7 @@ import {
   ItineraryHero,
   JourneyAtAGlance,
   ItineraryPlaces,
-  IncludedExtensions,
+  ItineraryPackageDetails,
   ItineraryEnquiry,
 } from '@/components/itinerary/itinerary-detail';
 import { itineraryQueries } from '@/features/catalog/queries';
@@ -49,11 +49,7 @@ export default async function ItineraryDetailPage({ params }: Props) {
       <ItineraryHero itinerary={itin} locale={locale} />
       <JourneyAtAGlance stops={itin.glanceStops} countryName={itin.countryName} />
       <ItineraryPlaces label={itin.placesLabel} places={itin.places} />
-      <IncludedExtensions
-        included={itin.included}
-        extensions={itin.extensions}
-        image={itin.image}
-      />
+      <ItineraryPackageDetails itinerary={itin} locale={locale} />
       <ItineraryEnquiry
         locale={locale}
         title={itin.title}

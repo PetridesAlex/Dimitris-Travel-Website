@@ -8,7 +8,7 @@ export default async function EditBlogPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const items = await blogQueries.getAll();
+  const items = await blogQueries.adminGetAll();
   const item = items.find((p) => p.id === id);
   if (!item) notFound();
   return <BlogEditor item={item} />;

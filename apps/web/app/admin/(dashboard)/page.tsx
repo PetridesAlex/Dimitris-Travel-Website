@@ -19,10 +19,10 @@ export default async function AdminDashboardPage() {
   const [enquiries, today, destinations, posts, itineraries, hotels] = await Promise.all([
     enquiryQueries.getAll(),
     enquiryQueries.getToday(),
-    destinationQueries.getAll(),
-    blogQueries.getAll(),
-    itineraryQueries.getAll(),
-    hotelQueries.getAll(),
+    destinationQueries.adminGetAll(),
+    blogQueries.adminGetAll(),
+    itineraryQueries.adminGetAll(),
+    hotelQueries.adminGetAll(),
   ]);
 
   const openEnquiries = enquiries.filter(

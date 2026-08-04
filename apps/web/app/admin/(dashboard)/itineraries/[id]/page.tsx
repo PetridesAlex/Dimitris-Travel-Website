@@ -8,7 +8,7 @@ export default async function EditItineraryPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const items = await itineraryQueries.getAll();
+  const items = await itineraryQueries.adminGetAll();
   const item = items.find((i) => i.id === id);
   if (!item) notFound();
   return <ItineraryEditor item={item} />;

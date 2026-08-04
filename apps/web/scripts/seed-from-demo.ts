@@ -386,6 +386,9 @@ async function seedItineraries(supabase: SupabaseClient) {
       places: it.places,
       glanceStops: it.glanceStops,
       extensions: it.extensions,
+      flights: it.flights,
+      departureDates: it.departureDates,
+      terms: it.terms,
       countryName: it.countryName,
       placesLabel: it.placesLabel,
     };

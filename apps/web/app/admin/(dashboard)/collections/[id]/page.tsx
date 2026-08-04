@@ -8,7 +8,7 @@ export default async function EditCollectionPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const items = await collectionQueries.getAll();
+  const items = await collectionQueries.adminGetAll();
   const item = items.find((c) => c.id === id);
   if (!item) notFound();
   return <CollectionEditor item={item} />;

@@ -4,7 +4,7 @@ import { AdminPageHeader, DataTable, StatusBadge } from '@/components/admin/page
 import { faqQueries } from '@/features/catalog/queries';
 
 export default async function AdminFaqsPage() {
-  const items = await faqQueries.getAll();
+  const items = await faqQueries.adminGetAll();
   return (
     <div>
       <AdminPageHeader

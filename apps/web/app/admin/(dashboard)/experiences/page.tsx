@@ -3,7 +3,7 @@ import { AdminPageHeader, DataTable, StatusBadge } from '@/components/admin/page
 import { experienceQueries } from '@/features/catalog/queries';
 
 export default async function AdminExperiencesPage() {
-  const items = await experienceQueries.getAll();
+  const items = await experienceQueries.adminGetAll();
   return (
     <div>
       <AdminPageHeader

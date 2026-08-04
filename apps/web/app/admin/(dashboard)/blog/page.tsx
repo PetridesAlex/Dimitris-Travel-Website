@@ -4,7 +4,7 @@ import { BlogManager } from '@/components/admin/blog-manager';
 import { blogQueries } from '@/features/catalog/queries';
 
 export default async function AdminBlogPage() {
-  const items = await blogQueries.getAll();
+  const items = await blogQueries.adminGetAll();
 
   return (
     <div>

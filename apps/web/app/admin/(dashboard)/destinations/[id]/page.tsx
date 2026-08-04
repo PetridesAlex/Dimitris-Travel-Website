@@ -8,7 +8,7 @@ export default async function EditDestinationPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const items = await destinationQueries.getAll();
+  const items = await destinationQueries.adminGetAll();
   const item = items.find((d) => d.id === id);
   if (!item) notFound();
   return <DestinationEditor item={item} />;

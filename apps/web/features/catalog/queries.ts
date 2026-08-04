@@ -45,6 +45,13 @@ function asArray<T>(value: unknown): T[] {
   return Array.isArray(value) ? (value as T[]) : [];
 }
 
+function onlyPublished<T>(rows: T[]): T[] {
+  return rows.filter((r) => {
+    const status = (r as { status?: string }).status;
+    return !status || status === 'published';
+  });
+}
+
 function includedExtras(included: unknown) {
   if (included && typeof included === 'object' && !Array.isArray(included)) {
     const obj = included as Record<string, unknown>;
@@ -53,6 +60,10 @@ function includedExtras(included: unknown) {
       places: asArray<DemoItinerary['places'][number]>(obj.places),
       glanceStops: asArray<DemoItinerary['glanceStops'][number]>(obj.glanceStops),
       extensions: asArray<DemoItinerary['extensions'][number]>(obj.extensions),
+      flights: asArray<string>(obj.flights),
+      departureDates: asArray<string>(obj.departureDates),
+      terms: asArray<string>(obj.terms),
+      days: asArray<DemoItinerary['days'][number]>(obj.days),
       countryName: String(obj.countryName ?? ''),
       placesLabel: String(obj.placesLabel ?? 'Places'),
     };
@@ -62,12 +73,16 @@ function includedExtras(included: unknown) {
     places: [] as DemoItinerary['places'],
     glanceStops: [] as DemoItinerary['glanceStops'],
     extensions: [] as DemoItinerary['extensions'],
+    flights: [] as string[],
+    departureDates: [] as string[],
+    terms: [] as string[],
+    days: [] as DemoItinerary['days'],
     countryName: '',
     placesLabel: 'Places',
   };
 }
 
-async function mapDestinations(db: Sb): Promise<DemoDestination[]> {
+async function mapDestinations(db: Sb): Promise<(DemoDestination & { status?: string })[]> {
   const { data, error } = await db
     .from('destinations')
     .select(
@@ -170,7 +185,7 @@ async function mapItineraries(db: Sb): Promise<(DemoItinerary & { status?: strin
     const tr = translations?.find((t) => t.locale === 'en') || translations?.[0] || {};
     const hero = row.media_assets as { url?: string } | null;
     const extras = includedExtras(row.included);
-    const days = asArray<Record<string, unknown>>(row.itinerary_days)
+    const daysFromTable = asArray<Record<string, unknown>>(row.itinerary_days)
       .sort((a, b) => Number(a.day_number) - Number(b.day_number))
       .map((d) => {
         const dayTr = asArray<Record<string, unknown>>(d.itinerary_day_translations);
@@ -181,6 +196,7 @@ async function mapItineraries(db: Sb): Promise<(DemoItinerary & { status?: strin
           body: String(dtr.body ?? ''),
         };
       });
+    const days = daysFromTable.length ? daysFromTable : extras.days;
 
     return {
       id: row.id,
@@ -202,6 +218,9 @@ async function mapItineraries(db: Sb): Promise<(DemoItinerary & { status?: strin
       days,
       included: extras.items.length ? extras.items : asArray<string>(row.included),
       excluded: asArray<string>(row.excluded),
+      flights: extras.flights,
+      departureDates: extras.departureDates,
+      terms: extras.terms,
       extensions: extras.extensions,
       status: row.status as string,
     };
@@ -348,6 +367,12 @@ export const destinationQueries = {
   getAll: async () => {
     const db = await publicDb();
     if (!db) return demoDestinations;
+    const rows = onlyPublished(await mapDestinations(db));
+    return rows.length ? rows : demoDestinations;
+  },
+  adminGetAll: async () => {
+    const db = await adminDb();
+    if (!db) return demoDestinations;
     const rows = await mapDestinations(db);
     return rows.length ? rows : demoDestinations;
   },
@@ -381,6 +406,12 @@ export const hotelQueries = {
   getAll: async () => {
     const db = await publicDb();
     if (!db) return demoHotels;
+    const rows = onlyPublished(await mapHotels(db));
+    return rows.length ? rows : demoHotels;
+  },
+  adminGetAll: async () => {
+    const db = await adminDb();
+    if (!db) return demoHotels;
     const rows = await mapHotels(db);
     return rows.length ? rows : demoHotels;
   },
@@ -397,6 +428,12 @@ export const hotelQueries = {
 export const experienceQueries = {
   getAll: async () => {
     const db = await publicDb();
+    if (!db) return demoExperiences;
+    const rows = onlyPublished(await mapExperiences(db));
+    return rows.length ? rows : demoExperiences;
+  },
+  adminGetAll: async () => {
+    const db = await adminDb();
     if (!db) return demoExperiences;
     const rows = await mapExperiences(db);
     return rows.length ? rows : demoExperiences;
@@ -415,8 +452,16 @@ export const itineraryQueries = {
   getAll: async () => {
     const db = await publicDb();
     if (!db) return demoItineraries;
+    const rows = onlyPublished(await mapItineraries(db));
+    if (!rows.length) return demoItineraries;
+    return rows.map(enrichItineraryPackageFields);
+  },
+  adminGetAll: async () => {
+    const db = await adminDb();
+    if (!db) return demoItineraries.map((i) => ({ ...i, status: 'published' as const }));
     const rows = await mapItineraries(db);
-    return rows.length ? rows : demoItineraries;
+    if (!rows.length) return demoItineraries.map((i) => ({ ...i, status: 'published' as const }));
+    return rows.map(enrichItineraryPackageFields);
   },
   getBySlug: async (slug: string) => {
     const all = await itineraryQueries.getAll();
@@ -429,9 +474,41 @@ export const itineraryQueries = {
   },
 };
 
+function enrichItineraryPackageFields<T extends DemoItinerary>(itin: T): T {
+  const demo = demoItineraries.find((d) => d.slug === itin.slug);
+  if (!demo) {
+    return {
+      ...itin,
+      flights: itin.flights ?? [],
+      departureDates: itin.departureDates ?? [],
+      terms: itin.terms ?? [],
+      days: itin.days ?? [],
+      excluded: itin.excluded ?? [],
+      included: itin.included ?? [],
+      extensions: itin.extensions ?? [],
+    };
+  }
+  return {
+    ...itin,
+    days: itin.days?.length ? itin.days : demo.days,
+    flights: itin.flights?.length ? itin.flights : demo.flights,
+    departureDates: itin.departureDates?.length ? itin.departureDates : demo.departureDates,
+    terms: itin.terms?.length ? itin.terms : demo.terms,
+    excluded: itin.excluded?.length ? itin.excluded : demo.excluded,
+    included: itin.included?.length ? itin.included : demo.included,
+    extensions: itin.extensions?.length ? itin.extensions : demo.extensions,
+  };
+}
+
 export const collectionQueries = {
   getAll: async () => {
     const db = await publicDb();
+    if (!db) return demoCollections;
+    const rows = onlyPublished(await mapCollections(db));
+    return rows.length ? rows : demoCollections;
+  },
+  adminGetAll: async () => {
+    const db = await adminDb();
     if (!db) return demoCollections;
     const rows = await mapCollections(db);
     return rows.length ? rows : demoCollections;
@@ -445,6 +522,12 @@ export const collectionQueries = {
 export const blogQueries = {
   getAll: async () => {
     const db = await publicDb();
+    if (!db) return demoBlogPosts;
+    const rows = onlyPublished(await mapBlog(db));
+    return rows.length ? rows : demoBlogPosts;
+  },
+  adminGetAll: async () => {
+    const db = await adminDb();
     if (!db) return demoBlogPosts;
     const rows = await mapBlog(db);
     return rows.length ? rows : demoBlogPosts;
@@ -463,6 +546,12 @@ export const testimonialQueries = {
   getAll: async () => {
     const db = await publicDb();
     if (!db) return demoTestimonials;
+    const rows = onlyPublished(await mapTestimonials(db));
+    return rows.length ? rows : demoTestimonials;
+  },
+  adminGetAll: async () => {
+    const db = await adminDb();
+    if (!db) return demoTestimonials;
     const rows = await mapTestimonials(db);
     return rows.length ? rows : demoTestimonials;
   },
@@ -471,6 +560,12 @@ export const testimonialQueries = {
 export const faqQueries = {
   getAll: async () => {
     const db = await publicDb();
+    if (!db) return demoFaqs;
+    const rows = onlyPublished(await mapFaqs(db));
+    return rows.length ? rows : demoFaqs;
+  },
+  adminGetAll: async () => {
+    const db = await adminDb();
     if (!db) return demoFaqs;
     const rows = await mapFaqs(db);
     return rows.length ? rows : demoFaqs;

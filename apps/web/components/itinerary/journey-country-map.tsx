@@ -1,5 +1,6 @@
 'use client';
 
+import { useId, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import countryMapPaths from '@/data/country-map-paths.json';
@@ -77,18 +78,18 @@ function parseViewBox(viewBox: string) {
 function placeLabels(stops: MapStop[], viewBox: string): LabeledStop[] {
   const vb = parseViewBox(viewBox);
   const candidates: Array<{ dx: number; dy: number; anchor: LabeledStop['anchor'] }> = [
-    { dx: 12, dy: -10, anchor: 'start' },
-    { dx: -12, dy: -10, anchor: 'end' },
-    { dx: 12, dy: 16, anchor: 'start' },
-    { dx: -12, dy: 16, anchor: 'end' },
-    { dx: 14, dy: 3, anchor: 'start' },
-    { dx: -14, dy: 3, anchor: 'end' },
-    { dx: 0, dy: -22, anchor: 'middle' },
-    { dx: 0, dy: 22, anchor: 'middle' },
-    { dx: 22, dy: -18, anchor: 'start' },
-    { dx: -22, dy: -18, anchor: 'end' },
-    { dx: 22, dy: 20, anchor: 'start' },
-    { dx: -22, dy: 20, anchor: 'end' },
+    { dx: 14, dy: -12, anchor: 'start' },
+    { dx: -14, dy: -12, anchor: 'end' },
+    { dx: 14, dy: 18, anchor: 'start' },
+    { dx: -14, dy: 18, anchor: 'end' },
+    { dx: 16, dy: 4, anchor: 'start' },
+    { dx: -16, dy: 4, anchor: 'end' },
+    { dx: 0, dy: -24, anchor: 'middle' },
+    { dx: 0, dy: 24, anchor: 'middle' },
+    { dx: 26, dy: -20, anchor: 'start' },
+    { dx: -26, dy: -20, anchor: 'end' },
+    { dx: 26, dy: 22, anchor: 'start' },
+    { dx: -26, dy: 22, anchor: 'end' },
   ];
 
   const placed: LabeledStop[] = [];
@@ -108,26 +109,29 @@ function placeLabels(stops: MapStop[], viewBox: string): LabeledStop[] {
       const box = labelBox(lx, ly, width, height, c.anchor);
 
       const inBounds =
-        box.x1 >= vb.minX + 4 &&
-        box.x2 <= vb.minX + vb.width - 4 &&
-        box.y1 >= vb.minY + 4 &&
-        box.y2 <= vb.minY + vb.height - 4;
+        box.x1 >= vb.minX + 6 &&
+        box.x2 <= vb.minX + vb.width - 6 &&
+        box.y1 >= vb.minY + 6 &&
+        box.y2 <= vb.minY + vb.height - 6;
 
       if (!inBounds) continue;
       if (boxes.some((b) => overlaps(box, b))) continue;
 
-      // Prefer not sitting on other markers
       const hitsMarker = stops.some((other, j) => {
         if (j === index) return false;
-        const mx1 = other.x - markerR;
-        const mx2 = other.x + markerR;
-        const my1 = other.y - markerR;
-        const my2 = other.y + markerR;
-        return overlaps(box, { x1: mx1, y1: my1, x2: mx2, y2: my2 }, 2);
+        return overlaps(
+          box,
+          {
+            x1: other.x - markerR,
+            y1: other.y - markerR,
+            x2: other.x + markerR,
+            y2: other.y + markerR,
+          },
+          2,
+        );
       });
       if (hitsMarker) continue;
 
-      // Prefer shorter offsets + top-right bias
       const dist = Math.hypot(c.dx, c.dy);
       const score = 100 - dist + (c.dy < 0 ? 8 : 0) + (c.anchor === 'start' ? 2 : 0);
       if (score > bestScore) {
@@ -137,28 +141,17 @@ function placeLabels(stops: MapStop[], viewBox: string): LabeledStop[] {
     }
 
     if (!best) {
-      // Fallback: staggered vertical stack to the side of the cluster
       const side = stop.x > vb.minX + vb.width / 2 ? -1 : 1;
-      const lx = stop.x + side * (18 + (index % 3) * 6);
-      const ly = stop.y - 14 + index * 15;
       best = {
         ...stop,
-        lx,
-        ly,
+        lx: stop.x + side * (18 + (index % 3) * 6),
+        ly: stop.y - 14 + index * 15,
         anchor: side < 0 ? 'end' : 'start',
       };
     }
 
     placed.push(best);
-    boxes.push(
-      labelBox(
-        best.lx,
-        best.ly,
-        width,
-        height,
-        best.anchor,
-      ),
-    );
+    boxes.push(labelBox(best.lx, best.ly, width, height, best.anchor));
   });
 
   return placed;
@@ -174,24 +167,33 @@ export function JourneyCountryMap({
   className?: string;
 }) {
   const reduce = useReducedMotion();
+  const uid = useId().replace(/:/g, '');
   const config = maps[countryName] ?? maps.Italy;
   const resolvedName = maps[countryName] ? countryName : 'Italy';
-  const stops = resolveStops(resolvedName, stopLabels);
-  const labeled = placeLabels(stops, config.viewBox);
+  const stops = useMemo(
+    () => resolveStops(resolvedName, stopLabels),
+    [resolvedName, stopLabels],
+  );
+  const labeled = useMemo(
+    () => placeLabels(stops, config.viewBox),
+    [stops, config.viewBox],
+  );
   const line = routePath(stops);
+  const gradientId = `routeGold-${uid}`;
+  const glowId = `softGlow-${uid}`;
 
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-xl border border-[#c5a059]/25 bg-[#0c0c0c]',
+        'relative overflow-hidden border border-[#c5a059]/35 bg-[#0c0c0c]',
         className,
       )}
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(197,160,89,0.16),transparent_55%)]" />
       <div className="pointer-events-none absolute inset-0 opacity-[0.18] [background-image:linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] [background-size:18px_18px]" />
 
-      <div className="relative flex h-full min-h-[240px] flex-col p-5 sm:p-6 md:min-h-[300px] md:p-7">
-        <div className="mb-3 flex items-end justify-between gap-4">
+      <div className="relative flex flex-col p-5 sm:p-6 md:p-7">
+        <div className="mb-4 flex items-end justify-between gap-4">
           <div>
             <p className="text-[10px] font-semibold tracking-[0.28em] text-[#c5a059] uppercase">
               Route map
@@ -205,21 +207,22 @@ export function JourneyCountryMap({
           </p>
         </div>
 
-        <div className="relative min-h-0 flex-1">
+        {/* Explicit height so the full SVG viewBox is always visible */}
+        <div className="relative w-full overflow-visible" style={{ aspectRatio: '5 / 4' }}>
           <svg
             viewBox={config.viewBox}
-            className="h-full w-full"
+            className="absolute inset-0 h-full w-full"
             preserveAspectRatio="xMidYMid meet"
             role="img"
             aria-label={`Map of ${countryName} showing journey stops`}
           >
             <defs>
-              <linearGradient id="routeGold" x1="0%" y1="0%" x2="100%" y2="100%">
+              <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#c5a059" stopOpacity="0.35" />
                 <stop offset="50%" stopColor="#c5a059" stopOpacity="1" />
                 <stop offset="100%" stopColor="#c5a059" stopOpacity="0.45" />
               </linearGradient>
-              <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+              <filter id={glowId} x="-40%" y="-40%" width="180%" height="180%">
                 <feGaussianBlur stdDeviation="2.2" result="blur" />
                 <feMerge>
                   <feMergeNode in="blur" />
@@ -253,7 +256,7 @@ export function JourneyCountryMap({
               <motion.path
                 d={line}
                 fill="none"
-                stroke="url(#routeGold)"
+                stroke={`url(#${gradientId})`}
                 strokeWidth={1.6}
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -267,8 +270,7 @@ export function JourneyCountryMap({
 
             {labeled.map((stop, index) => {
               const title = `${String(index + 1).padStart(2, '0')} ${stop.label}`;
-              const needsLeader =
-                Math.hypot(stop.lx - stop.x, stop.ly - stop.y) > 16;
+              const needsLeader = Math.hypot(stop.lx - stop.x, stop.ly - stop.y) > 16;
 
               return (
                 <g key={`${stop.label}-${index}`}>
@@ -299,7 +301,7 @@ export function JourneyCountryMap({
                     cy={stop.y}
                     r={4.2}
                     fill="#c5a059"
-                    filter="url(#softGlow)"
+                    filter={`url(#${glowId})`}
                     initial={reduce ? false : { scale: 0, opacity: 0 }}
                     whileInView={reduce ? undefined : { scale: 1, opacity: 1 }}
                     viewport={{ once: true }}
@@ -324,46 +326,41 @@ export function JourneyCountryMap({
                     />
                   ) : null}
 
-                  {/* Soft plate behind text for contrast */}
-                  <motion.text
+                  <text
                     x={stop.lx}
                     y={stop.ly}
-                    fill="#0c0c0c"
+                    fill="#f7f3eb"
                     fontSize={11}
                     fontWeight={600}
                     letterSpacing="0.04em"
                     textAnchor={stop.anchor}
                     stroke="#0c0c0c"
-                    strokeWidth={3.5}
+                    strokeWidth={3.2}
                     paintOrder="stroke"
                     strokeLinejoin="round"
-                    initial={reduce ? false : { opacity: 0 }}
-                    whileInView={reduce ? undefined : { opacity: 0.55 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.5 + index * 0.08 }}
                   >
                     {title}
-                  </motion.text>
-                  <motion.text
-                    x={stop.lx}
-                    y={stop.ly}
-                    fill="#f7f3eb"
-                    fontSize={11}
-                    fontWeight={500}
-                    letterSpacing="0.04em"
-                    textAnchor={stop.anchor}
-                    initial={reduce ? false : { opacity: 0 }}
-                    whileInView={reduce ? undefined : { opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.55 + index * 0.08 }}
-                  >
-                    {title}
-                  </motion.text>
+                  </text>
                 </g>
               );
             })}
           </svg>
         </div>
+
+        {/* Accessible stop list — avoids relying only on clipped SVG labels */}
+        <ol className="mt-5 grid gap-2 border-t border-white/10 pt-4 sm:grid-cols-3">
+          {stops.map((stop, index) => (
+            <li
+              key={`${stop.label}-${index}`}
+              className="flex items-center gap-2.5 text-sm text-white/75"
+            >
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center border border-[#c5a059] font-[family-name:var(--font-display)] text-xs text-[#c5a059]">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <span className="font-medium tracking-wide">{stop.label}</span>
+            </li>
+          ))}
+        </ol>
       </div>
     </div>
   );

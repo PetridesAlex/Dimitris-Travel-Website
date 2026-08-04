@@ -3,7 +3,7 @@ import { AdminPageHeader, DataTable, StatusBadge } from '@/components/admin/page
 import { hotelQueries } from '@/features/catalog/queries';
 
 export default async function AdminHotelsPage() {
-  const items = await hotelQueries.getAll();
+  const items = await hotelQueries.adminGetAll();
   return (
     <div>
       <AdminPageHeader

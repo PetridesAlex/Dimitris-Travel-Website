@@ -8,7 +8,7 @@ export default async function EditTestimonialPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const items = await testimonialQueries.getAll();
+  const items = await testimonialQueries.adminGetAll();
   const item = items.find((t) => t.id === id);
   if (!item) notFound();
   return <TestimonialEditor item={item} />;

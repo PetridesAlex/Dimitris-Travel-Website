@@ -3,7 +3,7 @@ import { AdminPageHeader, DataTable, StatusBadge } from '@/components/admin/page
 import { testimonialQueries } from '@/features/catalog/queries';
 
 export default async function AdminTestimonialsPage() {
-  const items = await testimonialQueries.getAll();
+  const items = await testimonialQueries.adminGetAll();
   return (
     <div>
       <AdminPageHeader

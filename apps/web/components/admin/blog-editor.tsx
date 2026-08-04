@@ -25,6 +25,7 @@ export function BlogEditor({
           action={saveBlogPost}
           dangerAction={item ? deleteBlogPost : undefined}
           dangerRedirect="/admin/blog"
+          createRedirect="/admin/blog"
           submitLabel={item ? 'Update post' : 'Create post'}
         >
           {item ? <input type="hidden" name="id" value={item.id} /> : null}

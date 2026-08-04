@@ -9,7 +9,7 @@ export default async function EditFaqPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const items = await faqQueries.getAll();
+  const items = await faqQueries.adminGetAll();
   const item = items.find((f: any) => f.id === id);
   if (!item) notFound();
   return <FaqEditor item={item} />;

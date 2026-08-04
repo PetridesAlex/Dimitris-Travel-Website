@@ -83,6 +83,9 @@ export type DemoItinerary = {
   days: { day: number; title: string; body: string }[];
   included: string[];
   excluded: string[];
+  flights: string[];
+  departureDates: string[];
+  terms: string[];
   extensions: DemoItineraryExtension[];
 };
 
@@ -1286,17 +1289,62 @@ export const itineraries: DemoItinerary[] = [
       {
         day: 1,
         title: 'Arrive Tokyo',
-        body: 'Private transfer to your hotel. Evening neighbourhood walk and welcome dinner.',
+        body: 'Private airport transfer to your hotel. Evening neighbourhood walk and a welcome dinner nearby.',
       },
       {
         day: 2,
         title: 'Tokyo immersion',
-        body: 'Private guide through Meiji Shrine, Omotesando, and a sushi counter lunch.',
+        body: 'Private guide through Meiji Shrine, Omotesando, and a sushi counter lunch. Free evening for jazz or Golden Gai.',
       },
       {
         day: 3,
+        title: 'Tokyo at your pace',
+        body: 'Optional museum morning or shopping. Afternoon reserved for a private experience of your choice.',
+      },
+      {
+        day: 4,
         title: 'Hakone onsen',
-        body: 'Journey to Hakone for lake views, onsen rituals, and kaiseki dining.',
+        body: 'Journey to Hakone for lake views, onsen rituals, and kaiseki dining at a refined ryokan.',
+      },
+      {
+        day: 5,
+        title: 'Kyoto arrival',
+        body: 'Travel to Kyoto. Settle into your hotel and evening stroll through Gion or Pontocho.',
+      },
+      {
+        day: 6,
+        title: 'Temples & gardens',
+        body: 'Early private temple visits before crowds, followed by a tea house pause and free afternoon.',
+      },
+      {
+        day: 7,
+        title: 'Kyoto craft & cuisine',
+        body: 'Artisan workshop or textile visit, then a curated dinner highlighting Kyoto’s seasonal cuisine.',
+      },
+      {
+        day: 8,
+        title: 'Nara day journey',
+        body: 'Day trip to Nara’s park and temples, returning to Kyoto for a quiet evening.',
+      },
+      {
+        day: 9,
+        title: 'Osaka nights',
+        body: 'Transfer to Osaka. Dotonbori night walk and a private food experience.',
+      },
+      {
+        day: 10,
+        title: 'Osaka flavours',
+        body: 'Morning at leisure or optional Himeji day trip. Farewell dinner in the city.',
+      },
+      {
+        day: 11,
+        title: 'Departure',
+        body: 'Private transfer to the airport for your onward flight.',
+      },
+      {
+        day: 12,
+        title: 'Buffer / depart',
+        body: 'Flexible morning for late departures or an optional final experience before flying home.',
       },
     ],
     included: [
@@ -1311,6 +1359,27 @@ export const itineraries: DemoItinerary[] = [
       'International flights',
       'Travel insurance',
       'Personal expenses & gratuities',
+      'Meals not listed in the program',
+      'Optional experiences booked locally',
+    ],
+    flights: [
+      'International flights are not included and can be arranged on request',
+      'Arrival into Tokyo (NRT or HND); departure from Osaka (KIX) or Tokyo',
+      'All private airport transfers on arrival and departure are included',
+      'Internal travel by private car and selected trains is included',
+    ],
+    departureDates: [
+      'Private departures year-round (minimum 2 guests)',
+      'Spring blossom window: late March – mid April',
+      'Autumn foliage window: late October – mid November',
+      'Summer & winter dates available on request',
+    ],
+    terms: [
+      'Prices are per person based on two guests sharing, unless stated otherwise',
+      'A deposit is required to confirm; balance due before departure as advised',
+      'Itinerary order may flex for seasonal access, weather, or local conditions',
+      'Cancellations and amendments follow our booking terms',
+      'Travel insurance is strongly recommended for all guests',
     ],
     extensions: [
       {
@@ -1408,12 +1477,47 @@ export const itineraries: DemoItinerary[] = [
       {
         day: 1,
         title: 'Marrakech arrival',
-        body: 'Settle into your riad. Sunset drinks overlooking the medina.',
+        body: 'Private transfer to your riad. Sunset drinks overlooking the medina and a welcome dinner.',
       },
       {
         day: 2,
         title: 'Medina & gardens',
-        body: 'Private guide through souks, palaces, and Majorelle Garden.',
+        body: 'Private guide through souks, palaces, and Majorelle Garden. Evening at leisure.',
+      },
+      {
+        day: 3,
+        title: 'Marrakech at pace',
+        body: 'Optional cooking class or spa morning. Afternoon free for the medina or a quiet courtyard.',
+      },
+      {
+        day: 4,
+        title: 'Into the Atlas',
+        body: 'Drive into the High Atlas for village walks, mint tea stops, and an overnight mountain lodge.',
+      },
+      {
+        day: 5,
+        title: 'Toward the Sahara',
+        body: 'Continue toward the dunes. Arrive at camp for sunset, dinner under the stars, and a night in the desert.',
+      },
+      {
+        day: 6,
+        title: 'Desert dawn',
+        body: 'Sunrise over the dunes, optional camel trek, and a second night at camp or a nearby kasbah.',
+      },
+      {
+        day: 7,
+        title: 'Road to Fes',
+        body: 'Scenic transfer toward Fes with stops at kasbahs and viewpoints along the way.',
+      },
+      {
+        day: 8,
+        title: 'Fes medina',
+        body: 'Private medina walk, artisan workshops, and a rooftop dinner above the old city.',
+      },
+      {
+        day: 9,
+        title: 'Departure',
+        body: 'Private transfer to Fes or Casablanca airport for your flight home.',
       },
     ],
     included: [
@@ -1423,7 +1527,32 @@ export const itineraries: DemoItinerary[] = [
       'Desert experience',
       '24/7 journey support',
     ],
-    excluded: ['International flights', 'Visa fees', 'Gratuities'],
+    excluded: [
+      'International flights',
+      'Visa fees',
+      'Gratuities',
+      'Travel insurance',
+      'Meals not listed in the program',
+    ],
+    flights: [
+      'International flights are not included and can be arranged on request',
+      'Recommended arrival into Marrakech (RAK); departure from Fes (FEZ) or Casablanca (CMN)',
+      'All private airport transfers on arrival and departure are included',
+      'Overland travel with a private driver is included throughout',
+    ],
+    departureDates: [
+      'Private departures year-round (minimum 2 guests)',
+      'Best season: March – May and September – November',
+      'Summer desert dates available with adjusted pacing',
+      'Ramadan and local holiday timing shared at booking',
+    ],
+    terms: [
+      'Prices are per person based on two guests sharing, unless stated otherwise',
+      'A deposit is required to confirm; balance due before departure as advised',
+      'Desert camp and mountain lodges may vary with weather and access',
+      'Cancellations and amendments follow our booking terms',
+      'Travel insurance is strongly recommended for all guests',
+    ],
     extensions: [
       {
         title: 'Essaouira Coast',
@@ -1503,7 +1632,52 @@ export const itineraries: DemoItinerary[] = [
       {
         day: 1,
         title: 'Amalfi arrival',
-        body: 'Cliffside hotel check-in and sunset aperitivo.',
+        body: 'Private transfer to your cliffside hotel. Sunset aperitivo overlooking the coast.',
+      },
+      {
+        day: 2,
+        title: 'Coast by boat',
+        body: 'Private boat day along the Amalfi Coast with swimming stops and a seaside lunch.',
+      },
+      {
+        day: 3,
+        title: 'Positano & Ravello',
+        body: 'Explore Positano and Ravello with a private driver, returning for a cliffside evening.',
+      },
+      {
+        day: 4,
+        title: 'Amalfi at leisure',
+        body: 'Morning free for the beach or spa. Optional village walk before dinner.',
+      },
+      {
+        day: 5,
+        title: 'Rome arrival',
+        body: 'Transfer to Rome. Boutique hotel check-in and Trastevere evening stroll.',
+      },
+      {
+        day: 6,
+        title: 'Rome icons',
+        body: 'Private Vatican or Colosseum experience, then free afternoon for piazzas and espresso.',
+      },
+      {
+        day: 7,
+        title: 'Rome neighbourhoods',
+        body: 'Guided food walk and time to explore at your own pace. Rooftop dinner option.',
+      },
+      {
+        day: 8,
+        title: 'Into Tuscany',
+        body: 'Drive into the Tuscan hills. Settle into a countryside villa or boutique hotel.',
+      },
+      {
+        day: 9,
+        title: 'Wine & villages',
+        body: 'Wine tasting with a producer and a leisurely lunch among the vines.',
+      },
+      {
+        day: 10,
+        title: 'Departure',
+        body: 'Private transfer to Florence or Rome airport for your onward flight.',
       },
     ],
     included: [
@@ -1513,7 +1687,31 @@ export const itineraries: DemoItinerary[] = [
       'Wine tasting',
       '24/7 journey support',
     ],
-    excluded: ['Flights', 'Insurance'],
+    excluded: [
+      'International flights',
+      'Travel insurance',
+      'Personal expenses & gratuities',
+      'Meals not listed in the program',
+    ],
+    flights: [
+      'International flights are not included and can be arranged on request',
+      'Recommended arrival into Naples (NAP) or Rome (FCO); departure from Florence (FLR) or Rome',
+      'All private airport and intercity transfers are included',
+      'Domestic flights are not required for this itinerary',
+    ],
+    departureDates: [
+      'Private departures year-round (minimum 2 guests)',
+      'Peak coast season: May – September',
+      'Quieter spring & autumn windows recommended for Amalfi',
+      'Christmas and Easter dates on request',
+    ],
+    terms: [
+      'Prices are per person based on two guests sharing, unless stated otherwise',
+      'A deposit is required to confirm; balance due before departure as advised',
+      'Boat days and coastal transfers may flex with sea conditions',
+      'Cancellations and amendments follow our booking terms',
+      'Travel insurance is strongly recommended for all guests',
+    ],
     extensions: [
       {
         title: 'Venice Interlude',

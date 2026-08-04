@@ -4,7 +4,7 @@ import { DestinationsManager } from '@/components/admin/destinations-manager';
 import { destinationQueries } from '@/features/catalog/queries';
 
 export default async function AdminDestinationsPage() {
-  const items = await destinationQueries.getAll();
+  const items = await destinationQueries.adminGetAll();
 
   return (
     <div>

@@ -23,6 +23,7 @@ export function CmsForm({
   dangerAction,
   dangerLabel = 'Delete',
   dangerRedirect,
+  createRedirect,
   className,
 }: {
   action: FormAction;
@@ -31,6 +32,8 @@ export function CmsForm({
   dangerAction?: FormAction;
   dangerLabel?: string;
   dangerRedirect?: string;
+  /** Base path for post-create navigation, e.g. `/admin/blog` → `/admin/blog/{id}` */
+  createRedirect?: string;
   className?: string;
 }) {
   const router = useRouter();
@@ -42,6 +45,7 @@ export function CmsForm({
     setError(null);
     setSuccess(false);
     const fd = new FormData(form);
+    const isCreate = !fd.get('id');
     startTransition(async () => {
       const result = await actionFn(fd);
       if (!result.ok) {
@@ -52,8 +56,8 @@ export function CmsForm({
       router.refresh();
       if (isDanger && dangerRedirect) {
         router.push(dangerRedirect);
-      } else if (!isDanger && result.id && !fd.get('id')) {
-        // After create, stay; parent list refresh is enough
+      } else if (!isDanger && isCreate && result.id && createRedirect) {
+        router.push(`${createRedirect.replace(/\/$/, '')}/${result.id}`);
       }
     });
   }

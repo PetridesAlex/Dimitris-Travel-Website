@@ -4,7 +4,7 @@ import { formatCurrency } from '@/lib/utils';
 import { itineraryQueries } from '@/features/catalog/queries';
 
 export default async function AdminItinerariesPage() {
-  const items = await itineraryQueries.getAll();
+  const items = await itineraryQueries.adminGetAll();
   return (
     <div>
       <AdminPageHeader

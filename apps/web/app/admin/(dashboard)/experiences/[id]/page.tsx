@@ -8,7 +8,7 @@ export default async function EditExperiencePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const items = await experienceQueries.getAll();
+  const items = await experienceQueries.adminGetAll();
   const item = items.find((e) => e.id === id);
   if (!item) notFound();
   return <ExperienceEditor item={item} />;

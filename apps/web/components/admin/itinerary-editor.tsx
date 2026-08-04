@@ -25,6 +25,7 @@ export function ItineraryEditor({
           action={saveItinerary}
           dangerAction={item ? deleteItinerary : undefined}
           dangerRedirect="/admin/itineraries"
+          createRedirect="/admin/itineraries"
           submitLabel={item ? 'Update itinerary' : 'Create itinerary'}
         >
           {item ? <input type="hidden" name="id" value={item.id} /> : null}
@@ -61,6 +62,31 @@ export function ItineraryEditor({
             label="Excluded"
             defaultValue={item?.excluded?.join('\n')}
             hint="One per line"
+          />
+          <TextArea
+            name="flights"
+            label="Flights"
+            defaultValue={item?.flights?.join('\n')}
+            hint="One note per line"
+          />
+          <TextArea
+            name="departureDates"
+            label="Departure dates"
+            defaultValue={item?.departureDates?.join('\n')}
+            hint="One window or date note per line"
+          />
+          <TextArea
+            name="terms"
+            label="Terms & conditions"
+            defaultValue={item?.terms?.join('\n')}
+            hint="One bullet per line"
+          />
+          <TextArea
+            name="days"
+            label="Program days (JSON)"
+            defaultValue={item?.days?.length ? JSON.stringify(item.days, null, 2) : ''}
+            rows={6}
+            hint='[{ "day": 1, "title": "...", "body": "..." }]'
           />
           <TextArea
             name="places"

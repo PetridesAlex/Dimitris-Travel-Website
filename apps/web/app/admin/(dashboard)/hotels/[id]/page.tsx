@@ -8,7 +8,7 @@ export default async function EditHotelPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const items = await hotelQueries.getAll();
+  const items = await hotelQueries.adminGetAll();
   const item = items.find((h) => h.id === id);
   if (!item) notFound();
   return <HotelEditor item={item} />;
