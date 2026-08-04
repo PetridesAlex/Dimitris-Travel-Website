@@ -704,6 +704,8 @@ export async function saveSiteSettings(formData: FormData): Promise<ActionResult
       instagram: str(formData, 'instagram'),
       facebook: str(formData, 'facebook'),
       linkedin: str(formData, 'linkedin'),
+      telegram: str(formData, 'telegram'),
+      whatsapp: str(formData, 'whatsapp'),
     },
   };
   const { error } = await (gate.db as any).from('site_settings').upsert(

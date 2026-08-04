@@ -29,6 +29,7 @@ import {
   itineraryQueries,
   faqQueries,
 } from '@/features/catalog/queries';
+import { resolveDestinationImage } from '@/lib/destination-images';
 
 type Props = {
   params: Promise<{ locale: string; continent: string; country: string }>;
@@ -104,6 +105,7 @@ export default async function CountryPage({ params }: Props) {
         subtitle={dest.tagline}
         description={dest.overview}
         image={dest.image}
+        imageAlt={dest.slug}
         primaryCta={{ label: 'Explore the Journey', href: '#overview' }}
         secondaryCta={{ label: 'Contact Us', href: `/${locale}/contact` }}
         tall={false}
@@ -153,7 +155,12 @@ export default async function CountryPage({ params }: Props) {
           />
           <RevealImage className="relative min-h-[480px] rounded-2xl lg:min-h-full">
             <Image
-              src={dest.image}
+              src={resolveDestinationImage({
+                image: dest.image,
+                slug: dest.slug,
+                slugPath: dest.slugPath,
+                name: dest.name,
+              })}
               alt={dest.name}
               fill
               className="object-cover"
@@ -179,19 +186,33 @@ export default async function CountryPage({ params }: Props) {
           <SectionHeading
             eyebrow="Top destinations"
             title={`Must-visit places in ${dest.name}`}
+            description={
+              cities.length
+                ? `${cities.length} curated destinations — each chosen for character, access, and extraordinary stays.`
+                : undefined
+            }
             light
           />
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-            {cities.map((city) => (
-              <DestinationCard
-                key={city.id}
-                href={`/${locale}/destinations/${city.slugPath}`}
-                name={city.name}
-                description={city.tagline}
-                image={city.image}
-              />
-            ))}
-          </div>
+          {cities.length > 0 ? (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {cities.map((city, i) => (
+                <DestinationCard
+                  key={city.id}
+                  href={`/${locale}/destinations/${city.slugPath}`}
+                  name={city.name}
+                  description={city.tagline}
+                  image={city.image}
+                  index={i}
+                  eyebrow="Destination"
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="mt-8 max-w-xl text-sm leading-relaxed text-white/45">
+              Destinations for {dest.name} are being curated. Explore the continent or plan a
+              tailor-made journey with our designers.
+            </p>
+          )}
         </div>
       </LazySection>
 

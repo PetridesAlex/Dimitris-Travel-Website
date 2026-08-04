@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { Mail, MapPin, Phone, ArrowUpRight } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -8,8 +9,14 @@ import { FadeIn } from '@/components/motion/fade-in';
 import { siteSettings } from '@/data/demo';
 import { cn } from '@/lib/utils';
 
+const RisingLines = dynamic(
+  () => import('@/components/marketing/rising-lines').then((m) => m.RisingLines),
+  { ssr: false },
+);
+
 const exploreLinks = [
   { href: '/destinations', label: 'Destinations' },
+  { href: '/explore', label: 'Explore the Map' },
   { href: '/experiences', label: 'Experiences' },
   { href: '/collections', label: 'Collections' },
   { href: '/itineraries', label: 'Itineraries' },
@@ -105,11 +112,32 @@ export function Footer({ locale = 'en' }: { locale?: string }) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative overflow-hidden bg-[#0c0c0c] text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_10%_0%,rgba(197,160,89,0.07),transparent_45%)]" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c5a059]/45 to-transparent" />
+    <footer className="relative isolate overflow-hidden bg-[#0c0c0c] text-white">
+      {!reduce ? (
+        <RisingLines
+          className="z-0 opacity-80"
+          color="#c5a059"
+          horizonColor="#c5a059"
+          haloColor="#e0c57a"
+          riseSpeed={0.07}
+          riseScale={12}
+          riseIntensity={0.5}
+          flowSpeed={0.16}
+          flowDensity={3}
+          flowIntensity={0.32}
+          horizonIntensity={0.5}
+          haloIntensity={3.8}
+          horizonHeight={-0.5}
+          circleScale={0.28}
+          scale={3.4}
+          brightness={0.8}
+        />
+      ) : null}
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_at_10%_0%,rgba(197,160,89,0.08),transparent_45%)]" />
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-[#0c0c0c] via-[#0c0c0c]/55 to-[#0c0c0c]/25" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-px bg-gradient-to-r from-transparent via-[#c5a059]/45 to-transparent" />
 
-      <div className="relative mx-auto max-w-7xl px-6 pt-16 pb-10 lg:px-8 lg:pt-20">
+      <div className="relative z-10 mx-auto max-w-7xl px-6 pt-16 pb-10 lg:px-8 lg:pt-20">
         <div className="grid gap-14 lg:grid-cols-[1.35fr_1fr_1fr_1.15fr] lg:gap-12">
           <FadeIn direction="up" distance={28} blur>
             <Link href={prefix} className="inline-flex flex-col leading-none">

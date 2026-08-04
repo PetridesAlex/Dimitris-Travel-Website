@@ -6,6 +6,7 @@ import { ArrowRight } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { FadeIn, ParallaxHeroMedia, TextReveal } from '@/components/motion/fade-in';
+import { resolveDestinationImage } from '@/lib/destination-images';
 import { cn } from '@/lib/utils';
 
 type HeroProps = {
@@ -77,6 +78,12 @@ export function Hero({
   scriptEyebrow = false,
   tall = true,
 }: HeroProps) {
+  const resolvedImage = resolveDestinationImage({
+    image,
+    name: title,
+    slug: imageAlt,
+  });
+
   return (
     <section
       className={`relative flex w-full items-end overflow-hidden ${
@@ -85,7 +92,7 @@ export function Hero({
     >
       <ParallaxHeroMedia>
         <Image
-          src={image}
+          src={resolvedImage}
           alt={imageAlt || title}
           fill
           priority

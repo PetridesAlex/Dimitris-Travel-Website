@@ -95,7 +95,7 @@ export function JourneyAtAGlance({
   return (
     <LazySection className="bg-[var(--color-cream)] px-6 pb-16 lg:px-8">
       <motion.div
-        className="relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-[#c5a059]/20 bg-white p-8 shadow-[0_30px_80px_-36px_rgba(12,12,12,0.45)] md:p-12 lg:p-14"
+        className="relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-[#c5a059]/20 bg-white p-5 shadow-[0_30px_80px_-36px_rgba(12,12,12,0.45)] sm:p-8 md:p-12 lg:p-14"
         initial={reduce ? false : { opacity: 0, y: 40, filter: 'blur(8px)' }}
         whileInView={reduce ? undefined : { opacity: 1, y: 0, filter: 'blur(0px)' }}
         viewport={{ once: true, amount: 0.2 }}
@@ -414,7 +414,7 @@ export function ItineraryPackageDetails({
                 effortless.
               </p>
             </div>
-            <div className="grid grid-cols-3 gap-px overflow-hidden border border-[#c5a059] bg-[#c5a059]">
+            <div className="grid grid-cols-3 gap-px overflow-hidden border border-[#c5a059]/45 bg-[#c5a059]/35 backdrop-blur-md">
               {[
                 { label: 'Duration', value: `${itinerary.durationDays} days` },
                 { label: 'From', value: priceLabel },
@@ -425,7 +425,7 @@ export function ItineraryPackageDetails({
               ].map((stat) => (
                 <div
                   key={stat.label}
-                  className="bg-[#0c0c0c] px-3 py-5 text-center sm:px-4 sm:py-6"
+                  className="bg-[#0c0c0c]/45 px-3 py-5 text-center backdrop-blur-xl sm:px-4 sm:py-6"
                 >
                   <p className="text-[11px] font-bold tracking-[0.28em] text-[#c5a059] uppercase">
                     {stat.label}

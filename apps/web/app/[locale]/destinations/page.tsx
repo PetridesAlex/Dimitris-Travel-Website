@@ -42,7 +42,7 @@ export default async function DestinationsIndexPage({
 
         {/* Large featured pair */}
         <div className="grid gap-4 md:grid-cols-2 md:gap-5 lg:gap-6">
-          {featured.map((c, i) => (
+            {featured.map((c, i) => (
             <DestinationCard
               key={c.id}
               href={`/${locale}/destinations/${c.slug}`}
@@ -51,6 +51,7 @@ export default async function DestinationsIndexPage({
               image={c.image}
               index={i}
               size="large"
+              eyebrow="Continent"
             />
           ))}
         </div>
@@ -67,6 +68,7 @@ export default async function DestinationsIndexPage({
                 image={c.image}
                 index={i + featured.length}
                 size="default"
+                eyebrow="Continent"
               />
             ))}
           </div>

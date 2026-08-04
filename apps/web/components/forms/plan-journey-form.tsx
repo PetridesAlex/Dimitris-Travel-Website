@@ -13,6 +13,7 @@ import {
   HeartHandshake,
 } from 'lucide-react';
 import { destinations } from '@/data/demo';
+import { SAVED_DESTINATIONS_KEY } from '@/data/explore-destinations';
 import { submitEnquiry } from '@/features/enquiries/actions';
 import { cn } from '@/lib/utils';
 import {
@@ -172,12 +173,31 @@ export function PlanJourneyForm({ locale = 'en' }: { locale?: string }) {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
+      let next: PlanJourneyValues = { ...defaultValues };
+      let nextStep = 1;
+
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<PlanJourneyValues> & { step?: number };
         const { step: savedStep, ...rest } = parsed;
-        setValues((prev) => ({ ...prev, ...rest }));
-        if (savedStep && savedStep >= 1 && savedStep <= 4) setStep(savedStep);
+        next = { ...next, ...rest };
+        if (savedStep && savedStep >= 1 && savedStep <= 4) nextStep = savedStep;
       }
+
+      // Prefill from Explore Journey Board (heart saves)
+      const boardRaw = localStorage.getItem(SAVED_DESTINATIONS_KEY);
+      if (boardRaw) {
+        const board = JSON.parse(boardRaw) as { name: string }[];
+        if (Array.isArray(board) && board.length > 0 && !next.undecided) {
+          const names = board.map((b) => b.name).filter(Boolean);
+          next = {
+            ...next,
+            destinations: Array.from(new Set([...names, ...next.destinations])),
+          };
+        }
+      }
+
+      setValues(next);
+      setStep(nextStep);
     } catch {
       // ignore corrupt drafts
     }

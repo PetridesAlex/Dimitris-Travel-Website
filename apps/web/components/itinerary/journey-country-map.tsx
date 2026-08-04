@@ -71,10 +71,41 @@ function labelBox(
 
 function parseViewBox(viewBox: string) {
   const [minX, minY, width, height] = viewBox.split(/\s+/).map(Number);
-  return { minX, minY, width, height };
+  return {
+    minX: minX ?? 0,
+    minY: minY ?? 0,
+    width: width ?? 100,
+    height: height ?? 100,
+  };
 }
 
-/** Fan labels away from markers so city names stay readable (desktop SVG labels). */
+/** Expand viewBox so markers near edges stay visible with padding. */
+function paddedViewBox(viewBox: string, stops: MapStop[], padRatio = 0.06) {
+  const vb = parseViewBox(viewBox);
+  const padX = vb.width * padRatio;
+  const padY = vb.height * padRatio;
+
+  let x1 = vb.minX;
+  let y1 = vb.minY;
+  let x2 = vb.minX + vb.width;
+  let y2 = vb.minY + vb.height;
+
+  for (const s of stops) {
+    x1 = Math.min(x1, s.x - padX);
+    y1 = Math.min(y1, s.y - padY);
+    x2 = Math.max(x2, s.x + padX);
+    y2 = Math.max(y2, s.y + padY);
+  }
+
+  x1 -= padX * 0.35;
+  y1 -= padY * 0.35;
+  x2 += padX * 0.35;
+  y2 += padY * 0.35;
+
+  return `${x1} ${y1} ${x2 - x1} ${y2 - y1}`;
+}
+
+/** Fan labels away from markers so city names stay readable. */
 function placeLabels(stops: MapStop[], viewBox: string): LabeledStop[] {
   const vb = parseViewBox(viewBox);
   const candidates: Array<{ dx: number; dy: number; anchor: LabeledStop['anchor'] }> = [
@@ -178,6 +209,10 @@ export function JourneyCountryMap({
     () => placeLabels(stops, config.viewBox),
     [stops, config.viewBox],
   );
+  const viewBox = useMemo(
+    () => paddedViewBox(config.viewBox, stops),
+    [config.viewBox, stops],
+  );
   const line = routePath(stops);
   const gradientId = `routeGold-${uid}`;
   const glowId = `softGlow-${uid}`;
@@ -193,34 +228,31 @@ export function JourneyCountryMap({
       <div className="pointer-events-none absolute inset-0 opacity-[0.18] [background-image:linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] [background-size:18px_18px]" />
 
       <div className="relative flex w-full min-w-0 flex-col p-4 sm:p-6 md:p-7">
-        <div className="mb-3 flex items-end justify-between gap-3 sm:mb-4 sm:gap-4">
-          <div className="min-w-0">
+        <div className="mb-4 flex items-end justify-between gap-3 sm:mb-5">
+          <div className="min-w-0 flex-1">
             <p className="text-[10px] font-semibold tracking-[0.28em] text-[#c5a059] uppercase">
               Route map
             </p>
-            <p className="mt-1 truncate font-[family-name:var(--font-display)] text-xl text-white sm:text-2xl md:text-3xl">
+            <p className="mt-1 font-[family-name:var(--font-display)] text-2xl leading-tight text-white sm:text-3xl">
               {countryName}
             </p>
           </div>
-          <p className="shrink-0 pb-0.5 text-[9px] tracking-[0.16em] text-white/40 uppercase sm:text-[10px] sm:tracking-[0.18em]">
-            {stops.length} stops
+          <p className="shrink-0 pb-1 text-[10px] tracking-[0.18em] text-white/45 uppercase">
+            {stops.length} {stops.length === 1 ? 'stop' : 'stops'}
           </p>
         </div>
 
-        {/*
-          Mobile: taller portrait frame so island/country shapes stay readable.
-          Desktop: wider landscape frame.
-        */}
+        {/* Tall enough on phones for the country shape + markers to read clearly */}
         <div
           className={cn(
-            'relative w-full min-w-0 overflow-hidden bg-black/20',
-            'h-[min(62vw,340px)] min-h-[260px]',
-            'sm:h-[min(48vw,380px)] sm:min-h-[300px]',
-            'md:aspect-[5/4] md:h-auto md:min-h-[360px]',
+            'relative w-full min-w-0 overflow-hidden bg-black/25',
+            'aspect-[3/4] min-h-[300px] max-h-[min(70vh,440px)]',
+            'sm:aspect-[4/5] sm:min-h-[340px] sm:max-h-[480px]',
+            'md:aspect-[5/4] md:max-h-none md:min-h-[380px]',
           )}
         >
           <svg
-            viewBox={config.viewBox}
+            viewBox={viewBox}
             className="absolute inset-0 h-full w-full"
             preserveAspectRatio="xMidYMid meet"
             role="img"
@@ -255,7 +287,7 @@ export function JourneyCountryMap({
               d={config.path}
               fill="rgba(197,160,89,0.22)"
               stroke="rgba(197,160,89,0.95)"
-              strokeWidth={1.4}
+              strokeWidth={1.6}
               initial={reduce ? false : { opacity: 0 }}
               whileInView={reduce ? undefined : { opacity: 1 }}
               viewport={{ once: true }}
@@ -267,7 +299,7 @@ export function JourneyCountryMap({
                 d={line}
                 fill="none"
                 stroke={`url(#${gradientId})`}
-                strokeWidth={2}
+                strokeWidth={2.4}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeDasharray="5 6"
@@ -288,15 +320,15 @@ export function JourneyCountryMap({
                   <motion.circle
                     cx={stop.x}
                     cy={stop.y}
-                    r={14}
+                    r={16}
                     fill="none"
                     stroke="#c5a059"
-                    strokeWidth={0.9}
+                    strokeWidth={1}
                     initial={reduce ? false : { opacity: 0 }}
                     whileInView={
                       reduce
                         ? undefined
-                        : { opacity: [0.55, 0.12, 0.55], scale: [1, 1.25, 1] }
+                        : { opacity: [0.55, 0.12, 0.55], scale: [1, 1.22, 1] }
                     }
                     viewport={{ once: false }}
                     transition={{
@@ -310,7 +342,7 @@ export function JourneyCountryMap({
                   <motion.circle
                     cx={stop.x}
                     cy={stop.y}
-                    r={7.5}
+                    r={9}
                     fill="#c5a059"
                     filter={`url(#${glowId})`}
                     initial={reduce ? false : { scale: 0, opacity: 0 }}
@@ -324,21 +356,20 @@ export function JourneyCountryMap({
                     }}
                     style={{ transformOrigin: `${stop.x}px ${stop.y}px` }}
                   />
-                  {/* Number inside marker — readable when SVG labels are hidden on mobile */}
                   <text
                     x={stop.x}
-                    y={stop.y + 3.5}
+                    y={stop.y + 4}
                     textAnchor="middle"
                     fill="#0c0c0c"
-                    fontSize={9}
+                    fontSize={10}
                     fontWeight={700}
                     style={{ pointerEvents: 'none' }}
                   >
                     {n}
                   </text>
 
-                  {/* Desktop-only SVG city labels; legend covers mobile */}
-                  <g className="hidden md:block" aria-hidden>
+                  {/* Labels from sm up — mobile uses the list below */}
+                  <g className="hidden sm:block" aria-hidden>
                     {needsLeader ? (
                       <line
                         x1={stop.x}
@@ -371,24 +402,17 @@ export function JourneyCountryMap({
           </svg>
         </div>
 
-        {/* Primary labels on mobile — horizontal scroll chips; grid on larger screens */}
-        <ol
-          className={cn(
-            'mt-4 flex gap-2 border-t border-white/10 pt-4',
-            '-mx-4 overflow-x-auto px-4 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
-            'sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0',
-            'md:grid-cols-3 lg:grid-cols-5',
-          )}
-        >
+        {/* All stops fully visible — stacked on phones, grid on larger screens */}
+        <ol className="mt-4 grid grid-cols-1 gap-2 border-t border-white/10 pt-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           {stops.map((stop, index) => (
             <li
               key={`${stop.label}-${index}`}
-              className="flex shrink-0 items-center gap-2.5 border border-[#c5a059]/35 bg-white/[0.04] px-3 py-2.5 text-sm text-white/85 sm:min-w-0"
+              className="flex min-w-0 items-center gap-3 border border-[#c5a059]/35 bg-white/[0.04] px-3.5 py-3 text-sm text-white/90"
             >
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center border border-[#c5a059] bg-[#0c0c0c] font-[family-name:var(--font-display)] text-xs font-semibold text-[#c5a059]">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-[#c5a059] bg-[#0c0c0c] font-[family-name:var(--font-display)] text-sm font-semibold text-[#c5a059]">
                 {String(index + 1).padStart(2, '0')}
               </span>
-              <span className="whitespace-nowrap font-medium tracking-wide sm:truncate">
+              <span className="min-w-0 flex-1 font-medium tracking-wide break-words">
                 {stop.label}
               </span>
             </li>

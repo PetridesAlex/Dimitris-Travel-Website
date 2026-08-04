@@ -18,32 +18,32 @@ export const navLinks = [
 export const trustFeatures = [
   {
     title: 'Tailor-made Journeys',
-    description: 'Every itinerary crafted around you',
+    description: 'Every itinerary imagined around your pace, preferences, and private moments.',
     icon: 'compass',
   },
   {
     title: 'Flights & Routes',
-    description: 'Seamless global connections',
+    description: 'Thoughtful connections that turn the journey itself into part of the story.',
     icon: 'plane',
   },
   {
     title: 'Handpicked Stays',
-    description: 'The finest hotels & villas',
+    description: 'Distinguished hotels and villas chosen for character, quiet luxury, and care.',
     icon: 'bed',
   },
   {
     title: 'Private Transfers',
-    description: 'Door-to-door comfort',
+    description: 'Seamless door-to-door arrivals — composed, discreet, and effortless.',
     icon: 'car',
   },
   {
     title: 'Unique Experiences',
-    description: 'Access beyond the ordinary',
+    description: 'Access beyond the ordinary — moments reserved for those who travel well.',
     icon: 'camera',
   },
   {
     title: '24/7 Support',
-    description: 'Always by your side',
+    description: 'A calm presence beside you, wherever the journey unfolds.',
     icon: 'headset',
   },
 ] as const;

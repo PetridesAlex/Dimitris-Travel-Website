@@ -1,0 +1,485 @@
+export const JOURNEY_MOODS = [
+  'Beach',
+  'Culture',
+  'Adventure',
+  'Food & Wine',
+  'Wellness',
+  'Safari',
+  'Honeymoon',
+  'Family',
+] as const;
+
+export type JourneyMood = (typeof JOURNEY_MOODS)[number];
+
+export const SEASONS = ['Spring', 'Summer', 'Autumn', 'Winter'] as const;
+export type Season = (typeof SEASONS)[number];
+
+export type ExploreCountry = {
+  slug: string;
+  name: string;
+  continentSlug: 'americas' | 'europe' | 'africa' | 'asia' | 'oceania';
+  slugPath: string;
+  /** Position on world map viewBox 0 0 1000 500 */
+  x: number;
+  y: number;
+  moods: JourneyMood[];
+  seasons: Season[];
+  blurb: string;
+};
+
+export const SAVED_DESTINATIONS_KEY = 'uncharted-saved-destinations';
+
+/** Curated country pins with mood + season affinity */
+export const exploreCountries: ExploreCountry[] = [
+  // Americas
+  {
+    slug: 'united-states',
+    name: 'United States',
+    continentSlug: 'americas',
+    slugPath: 'americas/united-states',
+    x: 168,
+    y: 168,
+    moods: ['Adventure', 'Culture', 'Family', 'Food & Wine'],
+    seasons: ['Spring', 'Summer', 'Autumn'],
+    blurb: 'Coastal escapes, national parks, and cities that never sleep.',
+  },
+  {
+    slug: 'canada',
+    name: 'Canada',
+    continentSlug: 'americas',
+    slugPath: 'americas/canada',
+    x: 175,
+    y: 110,
+    moods: ['Adventure', 'Family', 'Wellness'],
+    seasons: ['Summer', 'Autumn', 'Winter'],
+    blurb: 'Wilderness lodges, alpine lakes, and northern light skies.',
+  },
+  {
+    slug: 'mexico',
+    name: 'Mexico',
+    continentSlug: 'americas',
+    slugPath: 'americas/mexico',
+    x: 155,
+    y: 220,
+    moods: ['Beach', 'Culture', 'Food & Wine', 'Honeymoon', 'Family'],
+    seasons: ['Winter', 'Spring'],
+    blurb: 'Riviera calm, colonial cities, and cuisine with soul.',
+  },
+  {
+    slug: 'brazil',
+    name: 'Brazil',
+    continentSlug: 'americas',
+    slugPath: 'americas/brazil',
+    x: 268,
+    y: 340,
+    moods: ['Beach', 'Adventure', 'Culture', 'Honeymoon'],
+    seasons: ['Summer', 'Autumn', 'Winter'],
+    blurb: 'Atlantic light, rainforest drama, and carnival energy.',
+  },
+  {
+    slug: 'peru',
+    name: 'Peru',
+    continentSlug: 'americas',
+    slugPath: 'americas/peru',
+    x: 220,
+    y: 340,
+    moods: ['Culture', 'Adventure', 'Honeymoon'],
+    seasons: ['Spring', 'Autumn', 'Winter'],
+    blurb: 'Andean highlands, sacred valleys, and timeless ruins.',
+  },
+  {
+    slug: 'costa-rica',
+    name: 'Costa Rica',
+    continentSlug: 'americas',
+    slugPath: 'americas/costa-rica',
+    x: 185,
+    y: 255,
+    moods: ['Adventure', 'Wellness', 'Family', 'Beach'],
+    seasons: ['Winter', 'Spring'],
+    blurb: 'Rainforest canopy, Pacific sunsets, and pure wellness.',
+  },
+  {
+    slug: 'argentina',
+    name: 'Argentina',
+    continentSlug: 'americas',
+    slugPath: 'americas/argentina',
+    x: 250,
+    y: 400,
+    moods: ['Food & Wine', 'Adventure', 'Culture'],
+    seasons: ['Spring', 'Autumn', 'Winter'],
+    blurb: 'Malbec country, Patagonian ice, and Buenos Aires nights.',
+  },
+
+  // Europe
+  {
+    slug: 'italy',
+    name: 'Italy',
+    continentSlug: 'europe',
+    slugPath: 'europe/italy',
+    x: 512,
+    y: 165,
+    moods: ['Culture', 'Food & Wine', 'Honeymoon', 'Family', 'Beach'],
+    seasons: ['Spring', 'Summer', 'Autumn'],
+    blurb: 'Amalfi light, Tuscan tables, and cities built for wandering.',
+  },
+  {
+    slug: 'france',
+    name: 'France',
+    continentSlug: 'europe',
+    slugPath: 'europe/france',
+    x: 478,
+    y: 145,
+    moods: ['Culture', 'Food & Wine', 'Honeymoon', 'Wellness'],
+    seasons: ['Spring', 'Summer', 'Autumn'],
+    blurb: 'Provence scent, Parisian evenings, and vineyard roads.',
+  },
+  {
+    slug: 'greece',
+    name: 'Greece',
+    continentSlug: 'europe',
+    slugPath: 'europe/greece',
+    x: 545,
+    y: 178,
+    moods: ['Beach', 'Culture', 'Honeymoon', 'Food & Wine', 'Family'],
+    seasons: ['Spring', 'Summer', 'Autumn'],
+    blurb: 'Whitewashed islands, Aegean blue, and ancient quiet.',
+  },
+  {
+    slug: 'switzerland',
+    name: 'Switzerland',
+    continentSlug: 'europe',
+    slugPath: 'europe/switzerland',
+    x: 500,
+    y: 138,
+    moods: ['Adventure', 'Wellness', 'Honeymoon', 'Family'],
+    seasons: ['Summer', 'Winter', 'Autumn'],
+    blurb: 'Alpine peaks, lake steamers, and mountain spas.',
+  },
+  {
+    slug: 'iceland',
+    name: 'Iceland',
+    continentSlug: 'europe',
+    slugPath: 'europe/iceland',
+    x: 430,
+    y: 78,
+    moods: ['Adventure', 'Wellness', 'Honeymoon'],
+    seasons: ['Summer', 'Winter', 'Autumn'],
+    blurb: 'Black sand shores, geothermal baths, and aurora nights.',
+  },
+  {
+    slug: 'finland',
+    name: 'Finland',
+    continentSlug: 'europe',
+    slugPath: 'europe/finland',
+    x: 545,
+    y: 78,
+    moods: ['Adventure', 'Wellness', 'Family', 'Honeymoon'],
+    seasons: ['Winter', 'Summer'],
+    blurb: 'Lapland snow, glass igloos, and northern silence.',
+  },
+  {
+    slug: 'norway',
+    name: 'Norway',
+    continentSlug: 'europe',
+    slugPath: 'europe/norway',
+    x: 505,
+    y: 70,
+    moods: ['Adventure', 'Wellness', 'Family'],
+    seasons: ['Summer', 'Winter'],
+    blurb: 'Fjord drama, midnight sun, and arctic elegance.',
+  },
+  {
+    slug: 'spain',
+    name: 'Spain',
+    continentSlug: 'europe',
+    slugPath: 'europe/spain',
+    x: 455,
+    y: 168,
+    moods: ['Culture', 'Food & Wine', 'Beach', 'Family'],
+    seasons: ['Spring', 'Summer', 'Autumn'],
+    blurb: 'Andalusian rhythm, Basque kitchens, and Mediterranean days.',
+  },
+  {
+    slug: 'portugal',
+    name: 'Portugal',
+    continentSlug: 'europe',
+    slugPath: 'europe/portugal',
+    x: 438,
+    y: 172,
+    moods: ['Culture', 'Food & Wine', 'Beach', 'Honeymoon'],
+    seasons: ['Spring', 'Summer', 'Autumn'],
+    blurb: 'Atlantic cliffs, tiled cities, and slow wine country.',
+  },
+  {
+    slug: 'austria',
+    name: 'Austria',
+    continentSlug: 'europe',
+    slugPath: 'europe/austria',
+    x: 520,
+    y: 138,
+    moods: ['Culture', 'Adventure', 'Family', 'Wellness'],
+    seasons: ['Summer', 'Winter', 'Autumn'],
+    blurb: 'Imperial cities, alpine trails, and winter warmth.',
+  },
+
+  // Africa
+  {
+    slug: 'morocco',
+    name: 'Morocco',
+    continentSlug: 'africa',
+    slugPath: 'africa/morocco',
+    x: 468,
+    y: 198,
+    moods: ['Culture', 'Adventure', 'Honeymoon', 'Food & Wine'],
+    seasons: ['Spring', 'Autumn', 'Winter'],
+    blurb: 'Desert camps, riads and private guides.',
+  },
+  {
+    slug: 'kenya',
+    name: 'Kenya',
+    continentSlug: 'africa',
+    slugPath: 'africa/kenya',
+    x: 575,
+    y: 295,
+    moods: ['Safari', 'Adventure', 'Honeymoon', 'Family'],
+    seasons: ['Summer', 'Winter'],
+    blurb: 'Golden savannahs, tented camps, and the great migration.',
+  },
+  {
+    slug: 'tanzania',
+    name: 'Tanzania',
+    continentSlug: 'africa',
+    slugPath: 'africa/tanzania',
+    x: 585,
+    y: 320,
+    moods: ['Safari', 'Adventure', 'Honeymoon', 'Beach'],
+    seasons: ['Summer', 'Winter'],
+    blurb: 'Serengeti dawn, Kilimanjaro, and Zanzibar shores.',
+  },
+  {
+    slug: 'south-africa',
+    name: 'South Africa',
+    continentSlug: 'africa',
+    slugPath: 'africa/south-africa',
+    x: 555,
+    y: 390,
+    moods: ['Safari', 'Food & Wine', 'Adventure', 'Family'],
+    seasons: ['Spring', 'Autumn', 'Winter'],
+    blurb: 'Cape winelands, big five days, and ocean drives.',
+  },
+  {
+    slug: 'egypt',
+    name: 'Egypt',
+    continentSlug: 'africa',
+    slugPath: 'africa/egypt',
+    x: 555,
+    y: 210,
+    moods: ['Culture', 'Adventure', 'Family'],
+    seasons: ['Autumn', 'Winter', 'Spring'],
+    blurb: 'Nile nights, temple light, and desert horizons.',
+  },
+  {
+    slug: 'seychelles',
+    name: 'Seychelles',
+    continentSlug: 'africa',
+    slugPath: 'africa/seychelles',
+    x: 625,
+    y: 330,
+    moods: ['Beach', 'Honeymoon', 'Wellness'],
+    seasons: ['Spring', 'Autumn', 'Winter'],
+    blurb: 'Granite coves, villa privacy, and turquoise calm.',
+  },
+  {
+    slug: 'mauritius',
+    name: 'Mauritius',
+    continentSlug: 'africa',
+    slugPath: 'africa/mauritius',
+    x: 640,
+    y: 360,
+    moods: ['Beach', 'Honeymoon', 'Wellness', 'Family'],
+    seasons: ['Spring', 'Autumn', 'Winter'],
+    blurb: 'Lagoon villas, spa days, and island ease.',
+  },
+
+  // Asia
+  {
+    slug: 'japan',
+    name: 'Japan',
+    continentSlug: 'asia',
+    slugPath: 'asia/japan',
+    x: 855,
+    y: 168,
+    moods: ['Culture', 'Food & Wine', 'Honeymoon', 'Adventure', 'Family'],
+    seasons: ['Spring', 'Autumn', 'Winter'],
+    blurb: 'Cherry blossom mornings, onsen nights, and quiet temples.',
+  },
+  {
+    slug: 'maldives',
+    name: 'Maldives',
+    continentSlug: 'asia',
+    slugPath: 'asia/maldives',
+    x: 655,
+    y: 285,
+    moods: ['Beach', 'Honeymoon', 'Wellness'],
+    seasons: ['Winter', 'Spring'],
+    blurb: 'Overwater sanctuaries and endless Indian Ocean blue.',
+  },
+  {
+    slug: 'thailand',
+    name: 'Thailand',
+    continentSlug: 'asia',
+    slugPath: 'asia/thailand',
+    x: 755,
+    y: 250,
+    moods: ['Beach', 'Culture', 'Wellness', 'Food & Wine', 'Family'],
+    seasons: ['Winter', 'Spring'],
+    blurb: 'Island hideaways, temple cities, and healing spas.',
+  },
+  {
+    slug: 'indonesia',
+    name: 'Indonesia',
+    continentSlug: 'asia',
+    slugPath: 'asia/indonesia',
+    x: 800,
+    y: 310,
+    moods: ['Beach', 'Wellness', 'Adventure', 'Honeymoon', 'Culture'],
+    seasons: ['Summer', 'Autumn', 'Winter'],
+    blurb: 'Balinese rituals, jungle villas, and volcanic coastlines.',
+  },
+  {
+    slug: 'united-arab-emirates',
+    name: 'United Arab Emirates',
+    continentSlug: 'asia',
+    slugPath: 'asia/united-arab-emirates',
+    x: 605,
+    y: 220,
+    moods: ['Culture', 'Beach', 'Family', 'Food & Wine'],
+    seasons: ['Autumn', 'Winter', 'Spring'],
+    blurb: 'Desert resorts, skyline nights, and Arabian hospitality.',
+  },
+  {
+    slug: 'india',
+    name: 'India',
+    continentSlug: 'asia',
+    slugPath: 'asia/india',
+    x: 680,
+    y: 235,
+    moods: ['Culture', 'Wellness', 'Adventure', 'Food & Wine'],
+    seasons: ['Autumn', 'Winter', 'Spring'],
+    blurb: 'Palace stays, Himalayan foothills, and sacred cities.',
+  },
+  {
+    slug: 'sri-lanka',
+    name: 'Sri Lanka',
+    continentSlug: 'asia',
+    slugPath: 'asia/sri-lanka',
+    x: 675,
+    y: 280,
+    moods: ['Beach', 'Culture', 'Wellness', 'Adventure'],
+    seasons: ['Winter', 'Spring'],
+    blurb: 'Tea country, wildlife trails, and cinnamon coasts.',
+  },
+  {
+    slug: 'nepal',
+    name: 'Nepal',
+    continentSlug: 'asia',
+    slugPath: 'asia/nepal',
+    x: 705,
+    y: 210,
+    moods: ['Adventure', 'Culture', 'Wellness'],
+    seasons: ['Spring', 'Autumn'],
+    blurb: 'Himalayan lodges, temple valleys, and mountain air.',
+  },
+  {
+    slug: 'jordan',
+    name: 'Jordan',
+    continentSlug: 'asia',
+    slugPath: 'asia/jordan',
+    x: 565,
+    y: 195,
+    moods: ['Culture', 'Adventure', 'Honeymoon'],
+    seasons: ['Spring', 'Autumn', 'Winter'],
+    blurb: 'Petra at dawn, desert camps, and Dead Sea stillness.',
+  },
+
+  // Oceania
+  {
+    slug: 'australia',
+    name: 'Australia',
+    continentSlug: 'oceania',
+    slugPath: 'oceania/australia',
+    x: 845,
+    y: 360,
+    moods: ['Adventure', 'Beach', 'Family', 'Food & Wine'],
+    seasons: ['Spring', 'Summer', 'Autumn'],
+    blurb: 'Reef mornings, outback silence, and vineyard afternoons.',
+  },
+  {
+    slug: 'new-zealand',
+    name: 'New Zealand',
+    continentSlug: 'oceania',
+    slugPath: 'oceania/new-zealand',
+    x: 920,
+    y: 395,
+    moods: ['Adventure', 'Wellness', 'Honeymoon', 'Family'],
+    seasons: ['Spring', 'Summer', 'Autumn'],
+    blurb: 'Fjords, alpine trails, and lodges at the edge of the world.',
+  },
+  {
+    slug: 'french-polynesia',
+    name: 'French Polynesia',
+    continentSlug: 'oceania',
+    slugPath: 'oceania/french-polynesia',
+    x: 80,
+    y: 340,
+    moods: ['Beach', 'Honeymoon', 'Wellness'],
+    seasons: ['Spring', 'Autumn', 'Winter'],
+    blurb: 'Overwater bungalows and lagoon light beyond compare.',
+  },
+  {
+    slug: 'fiji',
+    name: 'Fiji',
+    continentSlug: 'oceania',
+    slugPath: 'oceania/fiji',
+    x: 960,
+    y: 345,
+    moods: ['Beach', 'Honeymoon', 'Family', 'Wellness'],
+    seasons: ['Spring', 'Autumn', 'Winter'],
+    blurb: 'Private islands, coral gardens, and barefoot luxury.',
+  },
+];
+
+export function countryMatchesFilters(
+  country: ExploreCountry,
+  mood: JourneyMood | null,
+  season: Season | null,
+) {
+  if (mood && !country.moods.includes(mood)) return false;
+  if (season && !country.seasons.includes(season)) return false;
+  return true;
+}
+
+export function continentHasMatches(
+  continentSlug: string,
+  mood: JourneyMood | null,
+  season: Season | null,
+) {
+  return exploreCountries.some(
+    (c) =>
+      c.continentSlug === continentSlug && countryMatchesFilters(c, mood, season),
+  );
+}
+
+export function pickInspiredCountry(
+  mood: JourneyMood | null,
+  season: Season | null,
+  excludeSlug?: string,
+) {
+  const pool = exploreCountries.filter(
+    (c) =>
+      countryMatchesFilters(c, mood, season) &&
+      (!excludeSlug || c.slug !== excludeSlug),
+  );
+  const list = pool.length > 0 ? pool : exploreCountries;
+  return list[Math.floor(Math.random() * list.length)]!;
+}

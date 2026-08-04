@@ -25,9 +25,117 @@ import {
   type DemoTestimonial,
   type DemoEnquiry,
 } from '@/data/demo';
+import { resolveDestinationImage } from '@/lib/destination-images';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Sb = any;
+
+/**
+ * When CMS has countries/continents but no city records, attach curated
+ * demo cities (and missing countries) so destination pages never look empty.
+ */
+function enrichDestinationsFromDemo(
+  rows: (DemoDestination & { status?: string })[],
+): (DemoDestination & { status?: string })[] {
+  const bySlugPath = new Set(rows.map((r) => r.slugPath));
+  const cmsCountries = rows.filter((r) => r.type === 'country');
+  const cmsContinents = rows.filter((r) => r.type === 'continent');
+  const demoCountries = demoDestinations.filter((d) => d.type === 'country');
+  const demoCities = demoDestinations.filter((d) => d.type === 'city');
+  const demoContinents = demoDestinations.filter((d) => d.type === 'continent');
+
+  const extras: (DemoDestination & { status?: string })[] = [];
+
+  // Ensure every CMS continent has its demo countries if CMS has none under it
+  for (const continent of cmsContinents) {
+    const hasCountries = rows.some(
+      (r) => r.type === 'country' && r.parentId === continent.id,
+    );
+    if (hasCountries) continue;
+
+    const demoContinent = demoContinents.find((d) => d.slug === continent.slug);
+    if (!demoContinent) continue;
+
+    for (const country of demoCountries.filter((c) => c.parentId === demoContinent.id)) {
+      if (bySlugPath.has(`${continent.slug}/${country.slug}`)) continue;
+      const slugPath = `${continent.slug}/${country.slug}`;
+      extras.push({
+        ...country,
+        id: `demo-${country.id}`,
+        parentId: continent.id,
+        slugPath,
+        image: resolveDestinationImage({
+          image: country.image,
+          slug: country.slug,
+          slugPath,
+          name: country.name,
+        }),
+        status: 'published',
+      });
+      bySlugPath.add(slugPath);
+    }
+  }
+
+  const countriesForCities = [
+    ...cmsCountries,
+    ...extras.filter((e) => e.type === 'country'),
+  ];
+
+  // Attach curated cities under each country (CMS or demo-filled)
+  for (const country of countriesForCities) {
+    const hasCities = rows.some(
+      (r) => r.type === 'city' && r.parentId === country.id,
+    );
+    const alreadyExtra = extras.some(
+      (r) => r.type === 'city' && r.parentId === country.id,
+    );
+    if (hasCities || alreadyExtra) continue;
+
+    const demoCountry =
+      demoCountries.find((d) => d.slug === country.slug) ??
+      demoCountries.find((d) => d.slugPath === country.slugPath);
+    if (!demoCountry) continue;
+
+    for (const city of demoCities.filter((c) => c.parentId === demoCountry.id)) {
+      const slugPath = `${country.slugPath}/${city.slug}`;
+      if (bySlugPath.has(slugPath)) continue;
+      extras.push({
+        ...city,
+        id: `demo-${city.id}`,
+        parentId: country.id,
+        slugPath,
+        image: resolveDestinationImage({
+          image: city.image,
+          slug: city.slug,
+          slugPath,
+          name: city.name,
+        }),
+        status: 'published',
+      });
+      bySlugPath.add(slugPath);
+    }
+  }
+
+  if (!extras.length) {
+    return rows.map(fillDestinationImage);
+  }
+  return [...rows, ...extras].map(fillDestinationImage);
+}
+
+function fillDestinationImage<T extends DemoDestination>(dest: T): T {
+  const demoMatch = demoDestinations.find(
+    (d) => d.slugPath === dest.slugPath || (d.slug === dest.slug && d.type === dest.type),
+  );
+  return {
+    ...dest,
+    image: resolveDestinationImage({
+      image: dest.image || demoMatch?.image || '',
+      slug: dest.slug,
+      slugPath: dest.slugPath,
+      name: dest.name,
+    }),
+  };
+}
 
 async function publicDb(): Promise<Sb | null> {
   if (isDemoMode()) return null;
@@ -105,7 +213,12 @@ async function mapDestinations(db: Sb): Promise<(DemoDestination & { status?: st
       name: String(tr.name ?? row.slug),
       tagline: String(tr.tagline ?? ''),
       overview: String(tr.overview ?? ''),
-      image: hero?.url || '',
+      image: resolveDestinationImage({
+        image: hero?.url || '',
+        slug: row.slug,
+        slugPath: row.slug_path,
+        name: String(tr.name ?? row.slug),
+      }),
       featured: Boolean(row.featured),
       bestTimeToVisit: String(tr.best_time_to_visit ?? ''),
       currency: String(tr.currency ?? ''),
@@ -366,15 +479,17 @@ async function mapEnquiries(db: Sb): Promise<DemoEnquiry[]> {
 export const destinationQueries = {
   getAll: async () => {
     const db = await publicDb();
-    if (!db) return demoDestinations;
+    if (!db) return demoDestinations.map(fillDestinationImage);
     const rows = onlyPublished(await mapDestinations(db));
-    return rows.length ? rows : demoDestinations;
+    if (!rows.length) return demoDestinations.map(fillDestinationImage);
+    return enrichDestinationsFromDemo(rows);
   },
   adminGetAll: async () => {
     const db = await adminDb();
-    if (!db) return demoDestinations;
+    if (!db) return demoDestinations.map(fillDestinationImage);
     const rows = await mapDestinations(db);
-    return rows.length ? rows : demoDestinations;
+    if (!rows.length) return demoDestinations.map(fillDestinationImage);
+    return enrichDestinationsFromDemo(rows);
   },
   getContinents: async () => {
     const all = await destinationQueries.getAll();
@@ -398,7 +513,29 @@ export const destinationQueries = {
   },
   getCitiesByCountry: async (countryId: string) => {
     const all = await destinationQueries.getAll();
-    return all.filter((d) => d.parentId === countryId && d.type === 'city');
+    const cities = all.filter((d) => d.parentId === countryId && d.type === 'city');
+    if (cities.length) return cities;
+
+    // Extra safety: match by country slug if parent ids diverged
+    const country = all.find((d) => d.id === countryId);
+    if (!country) return [];
+    const demoCountry = demoDestinations.find(
+      (d) => d.type === 'country' && d.slug === country.slug,
+    );
+    if (!demoCountry) return [];
+    return demoDestinations
+      .filter((d) => d.type === 'city' && d.parentId === demoCountry.id)
+      .map((city) => ({
+        ...city,
+        parentId: countryId,
+        slugPath: `${country.slugPath}/${city.slug}`,
+        image: resolveDestinationImage({
+          image: city.image,
+          slug: city.slug,
+          slugPath: `${country.slugPath}/${city.slug}`,
+          name: city.name,
+        }),
+      }));
   },
 };
 

@@ -20,6 +20,7 @@ import {
   experienceQueries,
   itineraryQueries,
 } from '@/features/catalog/queries';
+import { resolveDestinationImage } from '@/lib/destination-images';
 
 type Props = {
   params: Promise<{ locale: string; continent: string }>;
@@ -62,6 +63,7 @@ export default async function ContinentPage({ params }: Props) {
         subtitle={dest.tagline}
         description={dest.overview}
         image={dest.image}
+        imageAlt={dest.slug}
         primaryCta={{
           label: 'Explore the Journey',
           href: `#overview`,
@@ -110,7 +112,12 @@ export default async function ContinentPage({ params }: Props) {
           />
           <RevealImage className="relative min-h-[420px] rounded-2xl lg:min-h-full">
             <Image
-              src={dest.image}
+              src={resolveDestinationImage({
+                image: dest.image,
+                slug: dest.slug,
+                slugPath: dest.slugPath,
+                name: dest.name,
+              })}
               alt={dest.name}
               fill
               loading="lazy"
@@ -135,19 +142,33 @@ export default async function ContinentPage({ params }: Props) {
           <SectionHeading
             eyebrow="Top destinations"
             title={`Must-visit places in ${dest.name}`}
+            description={
+              children.length
+                ? `${children.length} destinations across ${dest.name} — curated for travellers who expect more.`
+                : undefined
+            }
             light
           />
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {children.map((child) => (
-              <DestinationCard
-                key={child.id}
-                href={`/${locale}/destinations/${child.slugPath}`}
-                name={child.name}
-                description={child.tagline}
-                image={child.image}
-              />
-            ))}
-          </div>
+          {children.length > 0 ? (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {children.map((child, i) => (
+                <DestinationCard
+                  key={child.id}
+                  href={`/${locale}/destinations/${child.slugPath}`}
+                  name={child.name}
+                  description={child.tagline}
+                  image={child.image}
+                  index={i}
+                  eyebrow={child.type === 'city' ? 'Destination' : 'Country'}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="mt-8 max-w-xl text-sm leading-relaxed text-white/45">
+              Destinations for {dest.name} are being curated. Explore other regions or plan a
+              tailor-made journey with our designers.
+            </p>
+          )}
         </div>
       </LazySection>
 

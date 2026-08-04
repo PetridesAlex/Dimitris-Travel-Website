@@ -151,7 +151,11 @@ export function TrustBar() {
                 <h3 className="font-[family-name:var(--font-display)] text-[15px] font-semibold leading-snug tracking-[0.08em] text-[#0c0c0c] uppercase transition-colors duration-300 group-hover:text-[#c5a059] md:text-base">
                   {feature.title}
                 </h3>
-                <p className="mt-3 max-w-[12.5rem] text-[13px] font-medium leading-relaxed text-[#0c0c0c]/75 md:text-sm">
+                <span
+                  aria-hidden
+                  className="mt-3 block h-px w-6 bg-[#c5a059]/55 transition-all duration-500 group-hover:w-10 group-hover:bg-[#c5a059]"
+                />
+                <p className="mt-3.5 max-w-[13.5rem] font-[family-name:var(--font-display)] text-[14px] font-normal leading-[1.65] tracking-[0.01em] text-[#0c0c0c]/70 md:max-w-[14.5rem] md:text-[15px] md:leading-[1.7]">
                   {feature.description}
                 </p>
               </motion.div>

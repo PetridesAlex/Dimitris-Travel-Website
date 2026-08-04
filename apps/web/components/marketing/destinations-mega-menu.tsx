@@ -210,11 +210,19 @@ export function DestinationsMegaMenu({
             </motion.div>
           </AnimatePresence>
 
-          <div className="mt-6 border-t border-white/10 pt-5">
+          <div className="mt-6 flex flex-wrap gap-3 border-t border-white/10 pt-5">
+            <Link
+              href={`${prefix}/explore`}
+              onClick={onNavigate}
+              className="inline-flex items-center gap-2 border border-[#c5a059] bg-[#c5a059]/10 px-4 py-2.5 text-[10px] font-semibold tracking-[0.22em] text-[#c5a059] uppercase transition hover:bg-[#c5a059] hover:text-[#0c0c0c]"
+            >
+              Explore the map
+              <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.5} />
+            </Link>
             <Link
               href={`${prefix}/destinations`}
               onClick={onNavigate}
-              className="inline-flex items-center gap-2 border border-[#c5a059]/40 px-4 py-2.5 text-[10px] font-semibold tracking-[0.22em] text-[#c5a059] uppercase transition hover:border-[#c5a059] hover:bg-[#c5a059] hover:text-[#0c0c0c]"
+              className="inline-flex items-center gap-2 border border-white/20 px-4 py-2.5 text-[10px] font-semibold tracking-[0.22em] text-white/55 uppercase transition hover:border-[#c5a059]/50 hover:text-[#c5a059]"
             >
               View all destinations
               <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.5} />
@@ -339,14 +347,24 @@ export function DestinationsMobileAccordion({
           );
         })}
       </div>
-      <Link
-        href={`${prefix}/destinations`}
-        onClick={onNavigate}
-        className="mt-2 inline-flex items-center gap-1.5 text-[11px] tracking-[0.18em] text-white/50 uppercase hover:text-[#c5a059]"
-      >
-        View all destinations
-        <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.5} />
-      </Link>
+      <div className="mt-3 flex flex-col gap-2.5">
+        <Link
+          href={`${prefix}/explore`}
+          onClick={onNavigate}
+          className="inline-flex items-center gap-1.5 text-[11px] tracking-[0.18em] text-[#c5a059] uppercase hover:text-[#d4b56e]"
+        >
+          Explore the map
+          <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.5} />
+        </Link>
+        <Link
+          href={`${prefix}/destinations`}
+          onClick={onNavigate}
+          className="inline-flex items-center gap-1.5 text-[11px] tracking-[0.18em] text-white/50 uppercase hover:text-[#c5a059]"
+        >
+          View all destinations
+          <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.5} />
+        </Link>
+      </div>
     </div>
   );
 }

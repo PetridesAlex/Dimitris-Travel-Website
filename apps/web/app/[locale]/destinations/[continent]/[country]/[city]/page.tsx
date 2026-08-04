@@ -16,6 +16,7 @@ import {
   hotelQueries,
   itineraryQueries,
 } from '@/features/catalog/queries';
+import { resolveDestinationImage } from '@/lib/destination-images';
 
 type Props = {
   params: Promise<{
@@ -68,6 +69,7 @@ export default async function CityPage({ params }: Props) {
         subtitle={dest.tagline}
         description={dest.overview}
         image={dest.image}
+        imageAlt={dest.slug}
         primaryCta={{ label: 'Plan Your Journey', href: `/${locale}/plan-your-journey` }}
         secondaryCta={{ label: 'Contact Us', href: `/${locale}/contact` }}
         tall={false}
@@ -103,7 +105,12 @@ export default async function CityPage({ params }: Props) {
           />
           <RevealImage className="relative min-h-[420px] rounded-2xl lg:min-h-full">
             <Image
-              src={dest.image}
+              src={resolveDestinationImage({
+                image: dest.image,
+                slug: dest.slug,
+                slugPath: dest.slugPath,
+                name: dest.name,
+              })}
               alt={dest.name}
               fill
               className="object-cover"

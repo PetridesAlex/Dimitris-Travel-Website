@@ -108,6 +108,18 @@ export default async function AdminSettingsPage() {
                     placeholder="https://instagram.com/…"
                   />
                   <TextInput
+                    name="telegram"
+                    label="Telegram"
+                    defaultValue={socials.telegram || ''}
+                    placeholder="https://t.me/…"
+                  />
+                  <TextInput
+                    name="whatsapp"
+                    label="WhatsApp"
+                    defaultValue={socials.whatsapp || ''}
+                    placeholder="https://wa.me/…"
+                  />
+                  <TextInput
                     name="facebook"
                     label="Facebook"
                     defaultValue={socials.facebook || ''}

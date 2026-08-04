@@ -1,4 +1,5 @@
 import type { ExperienceCategory } from '@luxury-travel/shared';
+import { destinationCities } from '@/data/destination-cities';
 
 export type DemoDestination = {
   id: string;
@@ -193,6 +194,27 @@ const img = {
   nz: 'https://images.unsplash.com/photo-1469521669194-babb389a6649?w=1200&q=80',
   polynesia:
     'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=80',
+  france:
+    'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=80',
+  spain:
+    'https://images.unsplash.com/photo-1543783207-ec64e4d953a9?w=1200&q=80',
+  portugal:
+    'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=1200&q=80',
+  norway:
+    'https://images.unsplash.com/photo-1507272931001-fc06c17e4b2a?w=1200&q=80',
+  finland:
+    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&q=80',
+  austria:
+    'https://images.unsplash.com/photo-1516550893923-42d28e5677af?w=1200&q=80',
+  colombia:
+    'https://images.unsplash.com/photo-1534943441045-10045f3f6554?w=1200&q=80',
+  argentina:
+    'https://images.unsplash.com/photo-1612294037637-ec328d0e51a1?w=1200&q=80',
+  costaRica:
+    'https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=1200&q=80',
+  vietnam:
+    'https://images.unsplash.com/photo-1528127269322-539801943592?w=1200&q=80',
+  rome: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=1200&q=80',
 };
 
 function country(opts: {
@@ -419,8 +441,7 @@ const countries: DemoDestination[] = [
     tagline: 'Coffee hills and Caribbean colour',
     overview:
       'Cartagena’s walls, Medellín’s energy, and coffee-region estates — Colombia is vibrant and newly essential.',
-    image: img.rio,
-    currency: 'Colombian Peso (COP)',
+    image: img.colombia,
     languages: 'Spanish',
     highlights: ['Cartagena', 'Medellín', 'Coffee Triangle'],
   }),
@@ -433,8 +454,7 @@ const countries: DemoDestination[] = [
     tagline: 'Tango, wine, and Patagonia',
     overview:
       'Buenos Aires evenings, Mendoza vineyards, and glacier landscapes — Argentina is passionate and grand.',
-    image: img.rio,
-    currency: 'Argentine Peso (ARS)',
+    image: img.argentina,
     languages: 'Spanish',
     highlights: ['Buenos Aires', 'Mendoza', 'Patagonia', 'Iguazú'],
   }),
@@ -447,8 +467,7 @@ const countries: DemoDestination[] = [
     tagline: 'Rainforest luxury and pura vida',
     overview:
       'Eco-lodges, Pacific surf coasts, and cloud-forest wildlife — Costa Rica is nature, elevated.',
-    image: img.oceania,
-    currency: 'Costa Rican Colón (CRC)',
+    image: img.costaRica,
     languages: 'Spanish',
     highlights: ['Arenal', 'Manuel Antonio', 'Peninsula Papagayo'],
   }),
@@ -528,7 +547,7 @@ const countries: DemoDestination[] = [
     tagline: 'From Ha Long to Hoi An',
     overview:
       'French-colonial elegance, lantern-lit towns, and dramatic coastline — Vietnam is a sensory journey.',
-    image: img.thailand,
+    image: img.vietnam,
     currency: 'Vietnamese Dong (VND)',
     languages: 'Vietnamese',
     highlights: ['Hanoi', 'Ha Long Bay', 'Hoi An', 'Saigon'],
@@ -811,8 +830,7 @@ const countries: DemoDestination[] = [
     tagline: 'Fjords and Arctic light',
     overview:
       'Dramatic fjords, design hotels, and northern lights — Norway is Scandinavian wilderness refined.',
-    image: img.iceland,
-    currency: 'Norwegian Krone (NOK)',
+    image: img.norway,
     languages: 'Norwegian, English',
     highlights: ['Bergen', 'Fjords', 'Lofoten', 'Oslo'],
   }),
@@ -825,9 +843,7 @@ const countries: DemoDestination[] = [
     tagline: 'Sauna, silence, and aurora',
     overview:
       'Glass igloos, lakeland calm, and design-led Helsinki — Finland is Nordic serenity.',
-    image: img.iceland,
-    currency: 'Euro (EUR)',
-    languages: 'Finnish, Swedish, English',
+    image: img.finland,
     highlights: ['Lapland', 'Helsinki', 'Lakeland'],
   }),
   country({
@@ -853,10 +869,7 @@ const countries: DemoDestination[] = [
     tagline: 'Architecture, wine, and late nights',
     overview:
       'Barcelona’s design, Andalusian soul, and Rioja vineyards — Spain is culture with warmth.',
-    image: img.amalfi,
-    currency: 'Euro (EUR)',
-    languages: 'Spanish',
-    highlights: ['Barcelona', 'Madrid', 'Andalusia', 'Mallorca'],
+    image: img.spain,
   }),
   country({
     id: 'country-portugal',
@@ -867,10 +880,7 @@ const countries: DemoDestination[] = [
     tagline: 'Atlantic light and tiled cities',
     overview:
       'Lisbon hills, Algarve cliffs, and Douro wine estates — Portugal is quietly irresistible.',
-    image: img.amalfi,
-    currency: 'Euro (EUR)',
-    languages: 'Portuguese',
-    highlights: ['Lisbon', 'Porto', 'Algarve', 'Douro'],
+    image: img.portugal,
   }),
   country({
     id: 'country-france',
@@ -881,10 +891,7 @@ const countries: DemoDestination[] = [
     tagline: 'The art of living well',
     overview:
       'Parisian elegance, Provençal light, and Alpine chalets — France remains the benchmark of refined travel.',
-    image: img.amalfi,
-    currency: 'Euro (EUR)',
-    languages: 'French',
-    highlights: ['Paris', 'Provence', 'French Riviera', 'Alps'],
+    image: img.france,
   }),
   country({
     id: 'country-austria',
@@ -895,7 +902,7 @@ const countries: DemoDestination[] = [
     tagline: 'Imperial cities and Alpine air',
     overview:
       'Vienna’s grandeur, Salzburg’s charm, and mountain resorts — Austria is cultured and crisp.',
-    image: img.swiss,
+    image: img.austria,
     currency: 'Euro (EUR)',
     languages: 'German',
     highlights: ['Vienna', 'Salzburg', 'Tyrol'],
@@ -960,93 +967,10 @@ const countries: DemoDestination[] = [
   }),
 ];
 
-const cities: DemoDestination[] = [
-  {
-    id: 'city-tokyo',
-    type: 'city',
-    parentId: 'country-japan',
-    slug: 'tokyo',
-    slugPath: 'asia/japan/tokyo',
-    name: 'Tokyo',
-    tagline: 'Neon, tradition, and endless discovery',
-    overview:
-      'A city of neighbourhoods — from quiet shrine paths to Michelin dining and design-led hotels.',
-    image: img.tokyo,
-    featured: true,
-    bestTimeToVisit: 'March – May, October – November',
-    currency: 'JPY',
-    languages: 'Japanese',
-    timezone: 'JST',
-    visaInfo: 'As Japan.',
-    weather: 'Humid summers; mild winters.',
-    highlights: ['Ginza', 'Meiji Shrine', 'Private sushi counters'],
-  },
-  {
-    id: 'city-kyoto',
-    type: 'city',
-    parentId: 'country-japan',
-    slug: 'kyoto',
-    slugPath: 'asia/japan/kyoto',
-    name: 'Kyoto',
-    tagline: 'Temples, tea, and timeless beauty',
-    overview:
-      'Japan’s cultural heart — geisha districts, Zen gardens, and refined ryokan hospitality.',
-    image: img.kyoto,
-    featured: true,
-    bestTimeToVisit: 'March – May, November',
-    currency: 'JPY',
-    languages: 'Japanese',
-    timezone: 'JST',
-    visaInfo: 'As Japan.',
-    weather: 'Beautiful spring and autumn colours.',
-    highlights: ['Fushimi Inari', 'Arashiyama', 'Gion'],
-  },
-  {
-    id: 'city-marrakech',
-    type: 'city',
-    parentId: 'country-morocco',
-    slug: 'marrakech',
-    slugPath: 'africa/morocco/marrakech',
-    name: 'Marrakech',
-    tagline: 'The Red City',
-    overview:
-      'Souks, palaces, and rooftop evenings — Marrakech is Morocco’s most magnetic city.',
-    image: img.marrakech,
-    featured: true,
-    bestTimeToVisit: 'March – May, September – November',
-    currency: 'MAD',
-    languages: 'Arabic, French',
-    timezone: 'GMT+1',
-    visaInfo: 'As Morocco.',
-    weather: 'Hot summers; pleasant spring and autumn.',
-    highlights: ['Jemaa el-Fnaa', 'Majorelle Garden', 'Private riads'],
-  },
-  {
-    id: 'city-rome',
-    type: 'city',
-    parentId: 'country-italy',
-    slug: 'rome',
-    slugPath: 'europe/italy/rome',
-    name: 'Rome',
-    tagline: 'Eternal city, endless stories',
-    overview:
-      'Layered history, world-class dining, and boutique stays near the city’s greatest landmarks.',
-    image: img.amalfi,
-    featured: false,
-    bestTimeToVisit: 'April – June, September – October',
-    currency: 'EUR',
-    languages: 'Italian',
-    timezone: 'CET',
-    visaInfo: 'Schengen.',
-    weather: 'Warm summers; mild winters.',
-    highlights: ['Private Vatican access', 'Trastevere', 'Rooftop dining'],
-  },
-];
-
 export const destinations: DemoDestination[] = [
   ...continents,
   ...countries,
-  ...cities,
+  ...(destinationCities as DemoDestination[]),
 ];
 
 export const hotels: DemoHotel[] = [
@@ -1937,6 +1861,8 @@ export const siteSettings = {
     instagram: 'https://instagram.com',
     facebook: 'https://facebook.com',
     linkedin: 'https://linkedin.com',
+    telegram: 'https://t.me/',
+    whatsapp: 'https://wa.me/442079460100',
   },
 };
 

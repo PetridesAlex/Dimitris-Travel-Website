@@ -10,6 +10,7 @@ import {
   DestinationsMobileAccordion,
 } from '@/components/marketing/destinations-mega-menu';
 import { cn } from '@/lib/utils';
+import { siteSettings } from '@/data/demo';
 
 function PlanCta({
   href,
@@ -70,6 +71,76 @@ function PlanCta({
   );
 }
 
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden
+    >
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function TelegramIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <path d="M21.5 4.3 3.7 11.1c-1.2.5-1.2 1.1-.2 1.4l4.6 1.4 1.8 5.4c.2.7.4.9 1 .9.6 0 .9-.3 1.2-.6l2.7-2.6 4.6 3.4c.8.5 1.5.2 1.7-.8L22.9 5.6c.3-1.2-.4-1.7-1.4-1.3zm-3.1 2.4-8.6 7.8-.3 3.4-1.5-4.7 10.4-6.5z" />
+    </svg>
+  );
+}
+
+function WhatsAppIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <path d="M12 2.1A9.9 9.9 0 0 0 2.9 16.3L2 22l5.9-.9A9.9 9.9 0 1 0 12 2.1zm5.7 14.2c-.2.7-1.3 1.2-2.1 1.4-.5.1-1.2.2-3.5-.7-2.9-1.2-4.8-4.2-4.9-4.4-.2-.2-1.3-1.7-1.3-3.3 0-1.5.8-2.3 1.1-2.6.3-.3.6-.4.8-.4h.6c.2 0 .4 0 .6.5l.9 2.1c.1.3.2.5 0 .8l-.4.7c-.2.2-.3.4-.1.7.2.3.8 1.3 1.7 2.1 1.2 1 2.2 1.3 2.5 1.5.3.1.5.1.7-.1l.9-1.1c.2-.2.4-.2.7-.1l2 1c.3.1.5.2.5.4 0 .1 0 .7-.3 1.4z" />
+    </svg>
+  );
+}
+
+function MobileSocialLink({
+  href,
+  label,
+  children,
+}: {
+  href: string;
+  label: string;
+  children: React.ReactNode;
+}) {
+  if (!href) return null;
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      aria-label={label}
+      className={cn(
+        'group relative flex h-12 w-12 items-center justify-center overflow-hidden',
+        'border border-white/15 bg-white/[0.04] text-white/70 backdrop-blur-md',
+        'transition duration-300',
+        'hover:border-[#c5a059]/55 hover:bg-[#c5a059]/12 hover:text-[#c5a059]',
+        'hover:shadow-[0_10px_30px_-16px_rgba(197,160,89,0.85)]',
+      )}
+    >
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-60"
+      />
+      <span className="relative z-10 transition duration-300 group-hover:scale-110">
+        {children}
+      </span>
+    </a>
+  );
+}
+
 const links = [
   { href: '/', label: 'Home' },
   { href: '/destinations', label: 'Destinations', dropdown: true },
@@ -85,7 +156,13 @@ function isActivePath(pathname: string, prefix: string, href: string) {
   return pathname === full || pathname.startsWith(`${full}/`);
 }
 
-export function Navbar({ locale = 'en' }: { locale?: string }) {
+export function Navbar({
+  locale = 'en',
+  socials,
+}: {
+  locale?: string;
+  socials?: Record<string, string>;
+}) {
   const [open, setOpen] = useState(false);
   const [destOpen, setDestOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -97,6 +174,31 @@ export function Navbar({ locale = 'en' }: { locale?: string }) {
   const isItineraryDetail = /\/itineraries\/[^/]+$/.test(pathname);
   const planHref = isItineraryDetail ? '#enquire' : `${prefix}/plan-your-journey`;
   const planLabel = isItineraryDetail ? 'Plan This Journey' : 'Plan Your Journey';
+
+  const resolvedSocials = {
+    ...siteSettings.socials,
+    ...socials,
+  };
+  const socialItems = [
+    {
+      key: 'instagram',
+      label: 'Instagram',
+      href: resolvedSocials.instagram || '',
+      icon: <InstagramIcon className="h-5 w-5" />,
+    },
+    {
+      key: 'telegram',
+      label: 'Telegram',
+      href: resolvedSocials.telegram || '',
+      icon: <TelegramIcon className="h-5 w-5" />,
+    },
+    {
+      key: 'whatsapp',
+      label: 'WhatsApp',
+      href: resolvedSocials.whatsapp || '',
+      icon: <WhatsAppIcon className="h-5 w-5" />,
+    },
+  ].filter((item) => Boolean(item.href));
 
   const forceSolid =
     /\/itineraries(\/|$)/.test(pathname) ||
@@ -287,16 +389,17 @@ export function Navbar({ locale = 'en' }: { locale?: string }) {
             animate={{ opacity: 1, height: 'auto' }}
             exit={reduceMotion ? undefined : { opacity: 0, height: 0 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden border-t border-[#c5a059]/20 bg-[#0c0c0c] lg:hidden"
+            className="overflow-hidden border-t border-white/10 bg-[#0c0c0c]/45 shadow-[inset_0_1px_0_0_rgba(197,160,89,0.15)] backdrop-blur-2xl lg:hidden"
           >
             <div className="relative flex max-h-[min(78vh,720px)] flex-col overflow-y-auto px-6 pb-8 pt-2">
-              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c5a059]/50 to-transparent" />
+              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_40%,rgba(12,12,12,0.25)_100%)]" />
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c5a059]/45 to-transparent" />
 
-              <p className="mb-5 pt-4 text-[10px] font-medium tracking-[0.35em] text-[#c5a059]/80 uppercase">
+              <p className="relative mb-5 pt-4 text-[10px] font-medium tracking-[0.35em] text-[#c5a059]/90 uppercase">
                 Navigate
               </p>
 
-              <nav className="flex flex-col">
+              <nav className="relative flex flex-col">
                 {links.map((link, index) => {
                   if (link.dropdown) {
                     return (
@@ -373,7 +476,7 @@ export function Navbar({ locale = 'en' }: { locale?: string }) {
                 initial={reduceMotion ? false : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: reduceMotion ? 0 : 0.28, duration: 0.35 }}
-                className="mt-8 space-y-5"
+                className="relative mt-8 space-y-5"
               >
                 <PlanCta
                   href={planHref}
@@ -381,6 +484,32 @@ export function Navbar({ locale = 'en' }: { locale?: string }) {
                   fullWidth
                   onClick={() => setOpen(false)}
                 />
+
+                {socialItems.length > 0 ? (
+                  <div className="border-t border-white/10 pt-6">
+                    <p className="mb-4 text-center text-[10px] font-medium tracking-[0.28em] text-[#c5a059]/85 uppercase">
+                      Connect
+                    </p>
+                    <div className="flex items-center justify-center gap-3">
+                      {socialItems.map((item, index) => (
+                        <motion.div
+                          key={item.key}
+                          initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            delay: reduceMotion ? 0 : 0.32 + index * 0.06,
+                            duration: 0.35,
+                          }}
+                        >
+                          <MobileSocialLink href={item.href} label={item.label}>
+                            {item.icon}
+                          </MobileSocialLink>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
                 <p className="text-center text-[10px] tracking-[0.22em] text-white/40 uppercase">
                   Bespoke journeys, crafted by hand
                 </p>

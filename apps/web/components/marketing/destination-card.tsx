@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { ArrowUpRight } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { FadeIn, RevealImage } from '@/components/motion/fade-in';
+import { resolveDestinationImage } from '@/lib/destination-images';
 import { cn } from '@/lib/utils';
 
 type Props = {
@@ -14,6 +15,8 @@ type Props = {
   image: string;
   index?: number;
   size?: 'default' | 'large';
+  /** Card eyebrow — defaults to Destination */
+  eyebrow?: string;
   className?: string;
 };
 
@@ -24,16 +27,20 @@ export function DestinationCard({
   image,
   index = 0,
   size = 'default',
+  eyebrow = 'Destination',
   className,
 }: Props) {
   const reduce = useReducedMotion();
   const large = size === 'large';
+  const resolvedImage = resolveDestinationImage({ image, href, name });
 
   return (
     <FadeIn
       className={cn(
         'group relative overflow-hidden',
-        large ? 'min-h-[420px] md:min-h-[520px] lg:min-h-[560px]' : 'min-h-[340px] md:min-h-[420px] lg:min-h-[460px]',
+        large
+          ? 'min-h-[420px] md:min-h-[520px] lg:min-h-[560px]'
+          : 'min-h-[340px] md:min-h-[420px] lg:min-h-[460px]',
         className,
       )}
       direction="up"
@@ -50,7 +57,7 @@ export function DestinationCard({
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           >
             <Image
-              src={image}
+              src={resolvedImage}
               alt={name}
               fill
               loading="lazy"
@@ -65,7 +72,7 @@ export function DestinationCard({
         </RevealImage>
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/10 transition duration-700 group-hover:via-black/45" />
-        <div className="pointer-events-none absolute inset-0 opacity-0 transition duration-700 group-hover:opacity-100 bg-[radial-gradient(ellipse_at_30%_80%,rgba(197,160,89,0.22),transparent_55%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_30%_80%,rgba(197,160,89,0.22),transparent_55%)] opacity-0 transition duration-700 group-hover:opacity-100" />
 
         <div
           className={cn(
@@ -74,7 +81,7 @@ export function DestinationCard({
           )}
         >
           <p className="mb-3 text-[10px] font-semibold tracking-[0.28em] text-[#c5a059] uppercase">
-            Continent {String(index + 1).padStart(2, '0')}
+            {eyebrow} {String(index + 1).padStart(2, '0')}
           </p>
           <h3
             className={cn(
