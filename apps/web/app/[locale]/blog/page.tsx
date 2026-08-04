@@ -1,6 +1,8 @@
 import { SectionHeading, BlogCard } from '@/components/marketing/sections';
 import { LazySection } from '@/components/motion/fade-in';
 import { blogQueries } from '@/features/catalog/queries';
+import { formatBlogDate } from '@/data/blog-articles';
+
 export const metadata = { title: 'Inspiration' };
 export default async function BlogPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -11,7 +13,15 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
         <SectionHeading eyebrow="Inspiration" title="Stories from the road" light align="left" />
         <div className="grid gap-8 md:grid-cols-3">
           {posts.map((p) => (
-            <BlogCard key={p.id} href={`/${locale}/blog/${p.slug}`} title={p.title} excerpt={p.excerpt} image={p.image} category={p.category} date={p.publishedAt} />
+            <BlogCard
+              key={p.id}
+              href={`/${locale}/blog/${p.slug}`}
+              title={p.title}
+              excerpt={p.excerpt}
+              image={p.image}
+              category={p.category}
+              date={formatBlogDate(p.publishedAt)}
+            />
           ))}
         </div>
       </LazySection>

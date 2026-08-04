@@ -1538,7 +1538,7 @@ export const blogPosts: DemoBlogPost[] = [
     title: 'How to plan your first luxury journey to Japan',
     excerpt:
       'Pacing, seasons, and the stays that transform a first visit into something unforgettable.',
-    body: 'Japan rewards thoughtful pacing. Begin in Tokyo, carve space for Hakone, and linger in Kyoto...',
+    body: '',
     image: img.blog,
     category: 'Inspiration',
     author: 'Elena Marquez',
@@ -1550,7 +1550,7 @@ export const blogPosts: DemoBlogPost[] = [
     title: 'Morocco in spring: the perfect shoulder season',
     excerpt:
       'Mild days, blooming valleys, and desert nights — why spring is our favourite time to go.',
-    body: 'Spring softens Morocco’s edges. Marrakech is vibrant without peak heat...',
+    body: '',
     image: img.morocco,
     category: 'Destinations',
     author: 'James Okonkwo',
@@ -1561,7 +1561,7 @@ export const blogPosts: DemoBlogPost[] = [
     slug: 'private-villas-mediterranean',
     title: 'Private villas along the Mediterranean',
     excerpt: 'Staffed villas with chefs, boats, and absolute privacy for multi-generational travel.',
-    body: 'For families and friends travelling together, a villa can be the most luxurious choice...',
+    body: '',
     image: img.amalfi,
     category: 'Stays',
     author: 'Sofia Rossi',

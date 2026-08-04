@@ -59,32 +59,84 @@ export function ExperienceCard({
   name,
   tagline,
   image,
+  index = 0,
+  size = 'default',
+  eyebrow = 'Experience',
+  className,
 }: {
   href: string;
   name: string;
   tagline: string;
   image: string;
+  index?: number;
+  size?: 'default' | 'large';
+  eyebrow?: string;
+  className?: string;
 }) {
+  const large = size === 'large';
+
   return (
-    <FadeIn direction="up" distance={40} blur duration={0.85}>
-      <Link href={href} className="group block overflow-hidden rounded-xl">
-        <RevealImage className="relative aspect-[4/3]">
+    <FadeIn
+      className={cn(
+        'group relative overflow-hidden',
+        large
+          ? 'min-h-[400px] md:min-h-[480px] lg:min-h-[520px]'
+          : 'min-h-[300px] md:min-h-[360px]',
+        className,
+      )}
+      direction="up"
+      distance={40}
+      blur
+      duration={0.85}
+      delay={0.05 * index}
+    >
+      <Link href={href} className="absolute inset-0 block">
+        <RevealImage className="absolute inset-0">
           <Image
             src={image}
             alt={name}
             fill
             loading="lazy"
             className="object-cover transition duration-700 group-hover:scale-105"
-            sizes="(max-width:768px) 100vw, 33vw"
+            sizes={
+              large
+                ? '(max-width:768px) 100vw, 50vw'
+                : '(max-width:768px) 100vw, 33vw'
+            }
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-          <div className="absolute bottom-0 p-5">
-            <h3 className="font-[family-name:var(--font-display)] text-2xl text-white">
-              {name}
-            </h3>
-            <p className="mt-1 text-sm text-white/70">{tagline}</p>
-          </div>
         </RevealImage>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/10 transition duration-700 group-hover:via-black/45" />
+        <div className="pointer-events-none absolute inset-0 opacity-0 transition duration-700 group-hover:opacity-100 bg-[radial-gradient(ellipse_at_30%_80%,rgba(197,160,89,0.2),transparent_55%)]" />
+        <div
+          className={cn(
+            'absolute inset-x-0 bottom-0',
+            large ? 'p-7 md:p-9' : 'p-5 md:p-6',
+          )}
+        >
+          <p className="mb-2 text-[10px] font-semibold tracking-[0.26em] text-[#c5a059] uppercase">
+            {eyebrow} {String(index + 1).padStart(2, '0')}
+          </p>
+          <h3
+            className={cn(
+              'font-[family-name:var(--font-display)] leading-[1.05] text-white',
+              large ? 'text-3xl md:text-4xl lg:text-5xl' : 'text-2xl md:text-3xl',
+            )}
+          >
+            {name}
+          </h3>
+          <p
+            className={cn(
+              'mt-2 text-white/70',
+              large ? 'max-w-md text-sm md:text-base' : 'text-sm',
+            )}
+          >
+            {tagline}
+          </p>
+          <span className="mt-4 inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.2em] text-[#c5a059] uppercase opacity-80 transition group-hover:opacity-100">
+            Discover
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" strokeWidth={1.75} />
+          </span>
+        </div>
       </Link>
     </FadeIn>
   );
