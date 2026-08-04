@@ -99,7 +99,7 @@ export function PremiumPreloader() {
       {visible ? (
         <motion.div
           data-uj-preloader
-          className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-hidden bg-[#030303]"
+          className="fixed inset-0 z-[200] flex flex-col items-center justify-center overflow-x-hidden overflow-y-auto bg-[#030303] py-8 sm:py-10"
           initial={{ opacity: 1 }}
           exit={{
             opacity: 0,
@@ -123,13 +123,13 @@ export function PremiumPreloader() {
           />
 
           <motion.div
-            className="relative z-10 flex w-full max-w-3xl flex-col items-center px-8 text-center"
+            className="relative z-10 flex w-full max-w-3xl flex-col items-center px-5 text-center sm:px-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
           >
             <motion.span
-              className="mb-8 text-lg text-[#c5a059]"
+              className="mb-4 text-base text-[#c5a059] sm:mb-8 sm:text-lg [@media(max-height:700px)]:mb-3"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.9, delay: 0.1 }}
@@ -138,18 +138,18 @@ export function PremiumPreloader() {
             </motion.span>
 
             <motion.p
-              className="mb-7 text-[11px] font-semibold tracking-[0.55em] text-[#c5a059] uppercase"
-              initial={{ opacity: 0, letterSpacing: '0.85em' }}
-              animate={{ opacity: 1, letterSpacing: '0.55em' }}
+              className="mb-4 max-w-full text-[9px] font-semibold tracking-[0.28em] text-[#c5a059] uppercase sm:mb-7 sm:text-[11px] sm:tracking-[0.55em] [@media(max-height:700px)]:mb-3"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               transition={{ duration: 1.3, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             >
               Entering the journey
             </motion.p>
 
-            <div className="overflow-hidden">
+            <div className="w-full overflow-visible px-1">
               <motion.h1
-                className="font-[family-name:var(--font-display)] text-5xl font-semibold tracking-[0.34em] text-white uppercase md:text-6xl lg:text-7xl"
-                initial={{ opacity: 0, y: '110%' }}
+                className="font-[family-name:var(--font-display)] text-[clamp(1.75rem,8vw,4.5rem)] font-semibold tracking-[0.12em] text-white uppercase sm:tracking-[0.22em] md:tracking-[0.28em] lg:tracking-[0.34em]"
+                initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1.05, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
               >
@@ -158,7 +158,7 @@ export function PremiumPreloader() {
             </div>
 
             <motion.p
-              className="mt-2 font-[family-name:var(--font-script)] text-4xl text-[#c5a059] md:text-5xl lg:text-6xl"
+              className="mt-1 font-[family-name:var(--font-script)] text-[clamp(1.75rem,7vw,3.75rem)] text-[#c5a059] sm:mt-2"
               initial={{ opacity: 0, y: 12, filter: 'blur(8px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
               transition={{ duration: 1.1, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
@@ -167,17 +167,17 @@ export function PremiumPreloader() {
             </motion.p>
 
             <motion.div
-              className="mt-9 h-px w-24 origin-center bg-gradient-to-r from-transparent via-[#c5a059] to-transparent"
+              className="mt-5 h-px w-16 origin-center bg-gradient-to-r from-transparent via-[#c5a059] to-transparent sm:mt-9 sm:w-24 [@media(max-height:700px)]:mt-4"
               initial={{ scaleX: 0, opacity: 0 }}
               animate={{ scaleX: 1, opacity: 1 }}
               transition={{ duration: 1, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
             />
 
-            <div className="relative mt-8 h-5 w-72 overflow-hidden md:w-96">
+            <div className="relative mt-5 h-5 w-full max-w-[18rem] overflow-hidden sm:mt-8 sm:max-w-md md:max-w-lg [@media(max-height:700px)]:mt-4">
               <AnimatePresence mode="wait">
                 <motion.p
                   key={phrases[phraseIndex]}
-                  className="absolute inset-0 text-[12px] font-medium tracking-[0.3em] text-white/45 uppercase"
+                  className="absolute inset-0 px-2 text-[10px] font-medium tracking-[0.18em] text-white/45 uppercase sm:text-[12px] sm:tracking-[0.3em]"
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
@@ -188,7 +188,7 @@ export function PremiumPreloader() {
               </AnimatePresence>
             </div>
 
-            <div className="mt-14 w-full max-w-xl px-2 sm:max-w-2xl">
+            <div className="mt-8 w-full max-w-xl sm:mt-14 sm:max-w-2xl [@media(max-height:700px)]:mt-6">
               <div className="relative h-1 w-full overflow-hidden bg-white/10 md:h-1.5">
                 <motion.div
                   className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#8f7132] via-[#c5a059] to-[#e0c57a]"
@@ -196,13 +196,13 @@ export function PremiumPreloader() {
                 />
                 <motion.div
                   aria-hidden
-                  className="absolute inset-y-0 w-24 bg-gradient-to-r from-transparent via-white/55 to-transparent md:w-32"
+                  className="absolute inset-y-0 w-16 bg-gradient-to-r from-transparent via-white/55 to-transparent sm:w-24 md:w-32"
                   animate={{ left: ['-25%', '120%'] }}
                   transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
                 />
               </div>
-              <div className="mt-5 flex items-center justify-between text-[12px] tracking-[0.32em] text-white/40 uppercase">
-                <span>Preparing your experience</span>
+              <div className="mt-4 flex flex-col items-center gap-2 text-[10px] tracking-[0.18em] text-white/40 uppercase sm:mt-5 sm:flex-row sm:items-center sm:justify-between sm:text-[12px] sm:tracking-[0.32em]">
+                <span className="text-center sm:text-left">Preparing your experience</span>
                 <span className="font-[family-name:var(--font-display)] text-base tracking-[0.2em] text-[#c5a059] md:text-lg">
                   {String(progress).padStart(2, '0')}
                   <span className="text-white/25">%</span>
@@ -213,7 +213,7 @@ export function PremiumPreloader() {
 
           <motion.div
             aria-hidden
-            className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#c5a059]/45 to-transparent"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#c5a059]/45 to-transparent"
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ duration: 1.4, delay: 0.3 }}
