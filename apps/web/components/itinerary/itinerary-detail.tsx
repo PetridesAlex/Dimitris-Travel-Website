@@ -95,7 +95,7 @@ export function JourneyAtAGlance({
   return (
     <LazySection className="bg-[var(--color-cream)] px-6 pb-16 lg:px-8">
       <motion.div
-        className="relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-[#c5a059]/20 bg-white p-5 shadow-[0_30px_80px_-36px_rgba(12,12,12,0.45)] sm:p-8 md:p-12 lg:p-14"
+        className="relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-[#c5a059]/20 bg-white p-4 shadow-[0_30px_80px_-36px_rgba(12,12,12,0.45)] sm:p-8 md:p-12 lg:p-14"
         initial={reduce ? false : { opacity: 0, y: 40, filter: 'blur(8px)' }}
         whileInView={reduce ? undefined : { opacity: 1, y: 0, filter: 'blur(0px)' }}
         viewport={{ once: true, amount: 0.2 }}
@@ -209,7 +209,7 @@ export function JourneyAtAGlance({
             <JourneyCountryMap
               countryName={countryName}
               stopLabels={stops.map((s) => s.label)}
-              className="w-full min-w-0"
+              className="w-full max-w-full"
             />
           </motion.div>
         </div>

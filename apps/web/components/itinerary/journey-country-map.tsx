@@ -79,16 +79,16 @@ function parseViewBox(viewBox: string) {
   };
 }
 
-/** Expand viewBox so markers near edges stay visible with padding. */
-function paddedViewBox(viewBox: string, stops: MapStop[], padRatio = 0.06) {
+/** Light padding so edge markers stay inside the frame without shrinking the country. */
+function paddedViewBox(viewBox: string, stops: MapStop[], padRatio = 0.04) {
   const vb = parseViewBox(viewBox);
   const padX = vb.width * padRatio;
   const padY = vb.height * padRatio;
 
-  let x1 = vb.minX;
-  let y1 = vb.minY;
-  let x2 = vb.minX + vb.width;
-  let y2 = vb.minY + vb.height;
+  let x1 = vb.minX - padX;
+  let y1 = vb.minY - padY;
+  let x2 = vb.minX + vb.width + padX;
+  let y2 = vb.minY + vb.height + padY;
 
   for (const s of stops) {
     x1 = Math.min(x1, s.x - padX);
@@ -96,11 +96,6 @@ function paddedViewBox(viewBox: string, stops: MapStop[], padRatio = 0.06) {
     x2 = Math.max(x2, s.x + padX);
     y2 = Math.max(y2, s.y + padY);
   }
-
-  x1 -= padX * 0.35;
-  y1 -= padY * 0.35;
-  x2 += padX * 0.35;
-  y2 += padY * 0.35;
 
   return `${x1} ${y1} ${x2 - x1} ${y2 - y1}`;
 }
@@ -220,15 +215,15 @@ export function JourneyCountryMap({
   return (
     <div
       className={cn(
-        'relative w-full min-w-0 overflow-hidden border border-[#c5a059]/35 bg-[#0c0c0c]',
+        'relative w-full max-w-full overflow-hidden border border-[#c5a059]/35 bg-[#0c0c0c]',
         className,
       )}
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(197,160,89,0.16),transparent_55%)]" />
       <div className="pointer-events-none absolute inset-0 opacity-[0.18] [background-image:linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] [background-size:18px_18px]" />
 
-      <div className="relative flex w-full min-w-0 flex-col p-4 sm:p-6 md:p-7">
-        <div className="mb-4 flex items-end justify-between gap-3 sm:mb-5">
+      <div className="relative flex w-full max-w-full flex-col p-3 sm:p-6 md:p-7">
+        <div className="mb-3 flex items-end justify-between gap-3 sm:mb-5">
           <div className="min-w-0 flex-1">
             <p className="text-[10px] font-semibold tracking-[0.28em] text-[#c5a059] uppercase">
               Route map
@@ -242,18 +237,17 @@ export function JourneyCountryMap({
           </p>
         </div>
 
-        {/* Tall enough on phones for the country shape + markers to read clearly */}
-        <div
-          className={cn(
-            'relative w-full min-w-0 overflow-hidden bg-black/25',
-            'aspect-[3/4] min-h-[300px] max-h-[min(70vh,440px)]',
-            'sm:aspect-[4/5] sm:min-h-[340px] sm:max-h-[480px]',
-            'md:aspect-[5/4] md:max-h-none md:min-h-[380px]',
-          )}
-        >
+        {/*
+          Mobile: fixed height + full width only.
+          Combining aspect-ratio with max-height shrinks width in browsers
+          (SVG was collapsing to ~168px), which made the country unreadable.
+        */}
+        <div className="relative w-full max-w-full shrink-0 self-stretch overflow-hidden bg-black/25 h-[min(58svh,420px)] min-h-[300px] sm:h-[min(52svh,460px)] md:h-auto md:min-h-[400px] md:aspect-[5/4]">
           <svg
             viewBox={viewBox}
-            className="absolute inset-0 h-full w-full"
+            className="block h-full w-full"
+            width="100%"
+            height="100%"
             preserveAspectRatio="xMidYMid meet"
             role="img"
             aria-label={`Map of ${countryName} showing journey stops`}
@@ -285,9 +279,11 @@ export function JourneyCountryMap({
 
             <motion.path
               d={config.path}
-              fill="rgba(197,160,89,0.22)"
+              fill="rgba(197,160,89,0.28)"
               stroke="rgba(197,160,89,0.95)"
-              strokeWidth={1.6}
+              strokeWidth={2}
+              strokeLinejoin="round"
+              vectorEffect="non-scaling-stroke"
               initial={reduce ? false : { opacity: 0 }}
               whileInView={reduce ? undefined : { opacity: 1 }}
               viewport={{ once: true }}
@@ -299,10 +295,11 @@ export function JourneyCountryMap({
                 d={line}
                 fill="none"
                 stroke={`url(#${gradientId})`}
-                strokeWidth={2.4}
+                strokeWidth={2.8}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeDasharray="5 6"
+                strokeDasharray="6 5"
+                vectorEffect="non-scaling-stroke"
                 initial={reduce ? false : { pathLength: 0, opacity: 0 }}
                 whileInView={reduce ? undefined : { pathLength: 1, opacity: 1 }}
                 viewport={{ once: true }}
@@ -320,10 +317,11 @@ export function JourneyCountryMap({
                   <motion.circle
                     cx={stop.x}
                     cy={stop.y}
-                    r={16}
+                    r={20}
                     fill="none"
                     stroke="#c5a059"
-                    strokeWidth={1}
+                    strokeWidth={1.2}
+                    vectorEffect="non-scaling-stroke"
                     initial={reduce ? false : { opacity: 0 }}
                     whileInView={
                       reduce
@@ -342,7 +340,7 @@ export function JourneyCountryMap({
                   <motion.circle
                     cx={stop.x}
                     cy={stop.y}
-                    r={9}
+                    r={11}
                     fill="#c5a059"
                     filter={`url(#${glowId})`}
                     initial={reduce ? false : { scale: 0, opacity: 0 }}
@@ -358,10 +356,10 @@ export function JourneyCountryMap({
                   />
                   <text
                     x={stop.x}
-                    y={stop.y + 4}
+                    y={stop.y + 4.5}
                     textAnchor="middle"
                     fill="#0c0c0c"
-                    fontSize={10}
+                    fontSize={11}
                     fontWeight={700}
                     style={{ pointerEvents: 'none' }}
                   >
