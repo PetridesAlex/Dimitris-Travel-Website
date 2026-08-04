@@ -8,8 +8,9 @@ import {
   blogQueries,
 } from '@/features/catalog/queries';
 import { LOCALES } from '@/lib/i18n/config';
+import { getSiteUrl } from '@/lib/site-url';
 
-const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+const base = getSiteUrl();
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPaths = [

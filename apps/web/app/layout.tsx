@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Cormorant_Garamond, Manrope, Great_Vibes } from 'next/font/google';
+import { getSiteUrl } from '@/lib/site-url';
 import './globals.css';
 
 const display = Cormorant_Garamond({
@@ -24,9 +25,7 @@ const script = Great_Vibes({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
-  ),
+  metadataBase: new URL(getSiteUrl()),
   title: {
     default: 'Uncharted Journeys | Luxury Tailor-Made Travel',
     template: '%s | Uncharted Journeys',
