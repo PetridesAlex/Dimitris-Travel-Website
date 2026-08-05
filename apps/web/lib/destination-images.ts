@@ -25,14 +25,14 @@ export const DESTINATION_IMAGES: Record<string, string> = {
   canada:
     'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?w=1400&q=80',
   mexico:
-    'https://images.unsplash.com/photo-1518105779142-d975f22dec20?w=1400&q=80',
+    'https://images.unsplash.com/photo-1518638150340-f706e86654de?w=1400&q=80',
   brazil:
     'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=1400&q=80',
   peru: 'https://images.unsplash.com/photo-1526392060635-9d6019884377?w=1400&q=80',
   colombia:
-    'https://images.unsplash.com/photo-1534943441045-10045f3f6554?w=1400&q=80',
+    'https://images.unsplash.com/photo-1552074284-5e88ef1aef18?w=1400&q=80',
   argentina:
-    'https://images.unsplash.com/photo-1612294037637-ec328d0e51a1?w=1400&q=80',
+    'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=1400&q=80',
   'costa-rica':
     'https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=1400&q=80',
 
@@ -74,7 +74,7 @@ export const DESTINATION_IMAGES: Record<string, string> = {
   morocco:
     'https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=1400&q=80',
   egypt:
-    'https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=1400&q=80',
+    'https://images.unsplash.com/photo-1568322445389-f64ac2515020?w=1400&q=80',
   mauritius:
     'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=1400&q=80',
   seychelles:
@@ -86,15 +86,15 @@ export const DESTINATION_IMAGES: Record<string, string> = {
   switzerland:
     'https://images.unsplash.com/photo-1527668752968-14dc70a27c95?w=1400&q=80',
   iceland:
-    'https://images.unsplash.com/photo-1531168556467-80aace8d0a0b?w=1400&q=80',
+    'https://images.unsplash.com/photo-1483347756197-71ef80e95f73?w=1400&q=80',
   norway:
-    'https://images.unsplash.com/photo-1507272931001-fc06c17e4b2a?w=1400&q=80',
+    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1400&q=80',
   finland:
     'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1400&q=80',
   greece:
     'https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=1400&q=80',
   spain:
-    'https://images.unsplash.com/photo-1543783207-ec64e4d953a9?w=1400&q=80',
+    'https://images.unsplash.com/photo-1583422409516-2895a77efded?w=1400&q=80',
   portugal:
     'https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=1400&q=80',
   france:
@@ -104,9 +104,9 @@ export const DESTINATION_IMAGES: Record<string, string> = {
 
   // Oceania countries
   australia:
-    'https://images.unsplash.com/photo-1506973035872-a4ff01bbaa92?w=1400&q=80',
+    'https://images.unsplash.com/photo-1549180030-48bf079fb38a?w=1400&q=80',
   'new-zealand':
-    'https://images.unsplash.com/photo-1469521669194-babb389a6649?w=1400&q=80',
+    'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1400&q=80',
   'french-polynesia':
     'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1400&q=80',
   fiji: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1400&q=80',
@@ -122,13 +122,43 @@ function slugFromHref(href?: string) {
 }
 
 /**
- * Treat blank / placeholder CMS values as missing so fallbacks apply.
+ * Unsplash photo IDs that currently 404 — treat as missing so slug fallbacks apply
+ * even when CMS / seed still stores the old URL.
+ */
+const DEAD_UNSPLASH_IDS = new Set([
+  'photo-1514214242363-ac1618d5b1c5',
+  'photo-1559511260-90199dacf2a2',
+  'photo-1517935706615-2717063cabc5',
+  'photo-1518105779142-d975f22dec20',
+  'photo-1544551763-77ef2d0c1356',
+  'photo-1531968455001-5c541ffad4c6',
+  'photo-1534943441045-10045f3f6554',
+  'photo-1612294037637-ec328d0e51a1',
+  'photo-1605640840607-3ba2230ae084',
+  'photo-1586861635166-cdafcbd82d7f',
+  'photo-1539650116574-75c0c6d73f6e',
+  'photo-1553913861-c0de99e5a518',
+  'photo-1531168556467-80aace8d0a0b',
+  'photo-1507272931001-fc06c17e4b2a',
+  'photo-1538332574038-2c7dadea7c0c',
+  'photo-1543783207-ec64e4d953a9',
+  'photo-1499002238440-d3629912ad85',
+  'photo-1491161712426-512d216cfc29',
+  'photo-1506973035872-a4ff01bbaa92',
+  'photo-1469521669194-babb389a6649',
+  'photo-1507699622108-4be3ab537415',
+]);
+
+/**
+ * Treat blank / placeholder / known-dead CMS values as missing so fallbacks apply.
  */
 function isUsableImageUrl(url: string) {
   const current = url.trim();
   if (!current || current === 'null' || current === 'undefined' || current === '/') {
     return false;
   }
+  const unsplashId = current.match(/photo-[\w-]+/)?.[0];
+  if (unsplashId && DEAD_UNSPLASH_IDS.has(unsplashId)) return false;
   return current.startsWith('http://') || current.startsWith('https://') || current.startsWith('/');
 }
 

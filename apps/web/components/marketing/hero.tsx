@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
@@ -8,6 +9,9 @@ import { Button } from '@/components/ui/button';
 import { FadeIn, ParallaxHeroMedia, TextReveal } from '@/components/motion/fade-in';
 import { resolveDestinationImage } from '@/lib/destination-images';
 import { cn } from '@/lib/utils';
+
+const HERO_FALLBACK =
+  'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1400&q=80';
 
 type HeroProps = {
   eyebrow?: string;
@@ -83,6 +87,11 @@ export function Hero({
     name: title,
     slug: imageAlt,
   });
+  const [src, setSrc] = useState(resolvedImage);
+
+  useEffect(() => {
+    setSrc(resolvedImage);
+  }, [resolvedImage]);
 
   return (
     <section
@@ -92,12 +101,15 @@ export function Hero({
     >
       <ParallaxHeroMedia>
         <Image
-          src={resolvedImage}
+          src={src}
           alt={imageAlt || title}
           fill
           priority
           className="scale-105 object-cover"
           sizes="100vw"
+          onError={() => {
+            if (src !== HERO_FALLBACK) setSrc(HERO_FALLBACK);
+          }}
         />
       </ParallaxHeroMedia>
       <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-black/25" />

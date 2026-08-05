@@ -79,23 +79,39 @@ function parseViewBox(viewBox: string) {
   };
 }
 
-/** Light padding so edge markers stay inside the frame without shrinking the country. */
-function paddedViewBox(viewBox: string, stops: MapStop[], padRatio = 0.04) {
-  const vb = parseViewBox(viewBox);
-  const padX = vb.width * padRatio;
-  const padY = vb.height * padRatio;
+/**
+ * Zoom onto the journey corridor so markers fill a phone-sized SVG.
+ * Full-country viewBoxes leave the route as tiny dots on ~320px widths.
+ */
+function fittedViewBox(baseViewBox: string, stops: MapStop[]) {
+  const vb = parseViewBox(baseViewBox);
 
-  let x1 = vb.minX - padX;
-  let y1 = vb.minY - padY;
-  let x2 = vb.minX + vb.width + padX;
-  let y2 = vb.minY + vb.height + padY;
-
-  for (const s of stops) {
-    x1 = Math.min(x1, s.x - padX);
-    y1 = Math.min(y1, s.y - padY);
-    x2 = Math.max(x2, s.x + padX);
-    y2 = Math.max(y2, s.y + padY);
+  if (!stops.length) {
+    return `${vb.minX} ${vb.minY} ${vb.width} ${vb.height}`;
   }
+
+  const sx1 = Math.min(...stops.map((s) => s.x));
+  const sy1 = Math.min(...stops.map((s) => s.y));
+  const sx2 = Math.max(...stops.map((s) => s.x));
+  const sy2 = Math.max(...stops.map((s) => s.y));
+
+  const cx = (sx1 + sx2) / 2;
+  const cy = (sy1 + sy2) / 2;
+  // Square-ish window centered on stops — large enough for country coastline context
+  const half = Math.max(sx2 - sx1, sy2 - sy1, 120) * 1.35;
+  let x1 = cx - half;
+  let y1 = cy - half * 1.05;
+  let x2 = cx + half;
+  let y2 = cy + half * 1.05;
+
+  const softMinX = vb.minX - vb.width * 0.02;
+  const softMinY = vb.minY - vb.height * 0.02;
+  const softMaxX = vb.minX + vb.width * 1.02;
+  const softMaxY = vb.minY + vb.height * 1.02;
+  x1 = Math.max(softMinX, x1);
+  y1 = Math.max(softMinY, y1);
+  x2 = Math.min(softMaxX, x2);
+  y2 = Math.min(softMaxY, y2);
 
   return `${x1} ${y1} ${x2 - x1} ${y2 - y1}`;
 }
@@ -205,7 +221,7 @@ export function JourneyCountryMap({
     [stops, config.viewBox],
   );
   const viewBox = useMemo(
-    () => paddedViewBox(config.viewBox, stops),
+    () => fittedViewBox(config.viewBox, stops),
     [config.viewBox, stops],
   );
   const line = routePath(stops);
@@ -238,16 +254,15 @@ export function JourneyCountryMap({
         </div>
 
         {/*
-          Mobile: fixed height + full width only.
-          Combining aspect-ratio with max-height shrinks width in browsers
-          (SVG was collapsing to ~168px), which made the country unreadable.
+          Explicit height + absolute SVG.
+          Do not animate map content with whileInView — overflow-hidden ancestors
+          often prevent IntersectionObserver from firing on mobile, leaving paths
+          stuck at opacity 0.
         */}
-        <div className="relative w-full max-w-full shrink-0 self-stretch overflow-hidden bg-black/25 h-[min(58svh,420px)] min-h-[300px] sm:h-[min(52svh,460px)] md:h-auto md:min-h-[400px] md:aspect-[5/4]">
+        <div className="relative isolate w-full max-w-full shrink-0 self-stretch overflow-hidden rounded-sm bg-[#141414] h-[320px] sm:h-[400px] md:h-[440px] lg:h-[480px]">
           <svg
             viewBox={viewBox}
-            className="block h-full w-full"
-            width="100%"
-            height="100%"
+            className="absolute inset-0 h-full w-full"
             preserveAspectRatio="xMidYMid meet"
             role="img"
             aria-label={`Map of ${countryName} showing journey stops`}
@@ -271,23 +286,20 @@ export function JourneyCountryMap({
               <path
                 key={i}
                 d={d}
-                fill="rgba(255,255,255,0.03)"
-                stroke="rgba(255,255,255,0.06)"
-                strokeWidth={0.4}
+                fill="rgba(255,255,255,0.04)"
+                stroke="rgba(255,255,255,0.08)"
+                strokeWidth={0.5}
               />
             ))}
 
-            <motion.path
+            {/* Always visible — no opacity:0 gate */}
+            <path
               d={config.path}
-              fill="rgba(197,160,89,0.28)"
+              fill="rgba(197,160,89,0.32)"
               stroke="rgba(197,160,89,0.95)"
-              strokeWidth={2}
+              strokeWidth={2.4}
               strokeLinejoin="round"
               vectorEffect="non-scaling-stroke"
-              initial={reduce ? false : { opacity: 0 }}
-              whileInView={reduce ? undefined : { opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             />
 
             {line ? (
@@ -295,15 +307,14 @@ export function JourneyCountryMap({
                 d={line}
                 fill="none"
                 stroke={`url(#${gradientId})`}
-                strokeWidth={2.8}
+                strokeWidth={3}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeDasharray="6 5"
+                strokeDasharray="7 5"
                 vectorEffect="non-scaling-stroke"
-                initial={reduce ? false : { pathLength: 0, opacity: 0 }}
-                whileInView={reduce ? undefined : { pathLength: 1, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 1.35, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                initial={reduce ? false : { pathLength: 0 }}
+                animate={reduce ? undefined : { pathLength: 1 }}
+                transition={{ duration: 1.2, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
               />
             ) : null}
 
@@ -314,59 +325,35 @@ export function JourneyCountryMap({
 
               return (
                 <g key={`${stop.label}-${index}`}>
-                  <motion.circle
+                  <circle
                     cx={stop.x}
                     cy={stop.y}
-                    r={20}
+                    r={22}
                     fill="none"
                     stroke="#c5a059"
-                    strokeWidth={1.2}
+                    strokeWidth={1.4}
+                    opacity={0.45}
                     vectorEffect="non-scaling-stroke"
-                    initial={reduce ? false : { opacity: 0 }}
-                    whileInView={
-                      reduce
-                        ? undefined
-                        : { opacity: [0.55, 0.12, 0.55], scale: [1, 1.22, 1] }
-                    }
-                    viewport={{ once: false }}
-                    transition={{
-                      duration: 2.6,
-                      repeat: Infinity,
-                      delay: 0.45 + index * 0.18,
-                      ease: 'easeInOut',
-                    }}
-                    style={{ transformOrigin: `${stop.x}px ${stop.y}px` }}
                   />
-                  <motion.circle
+                  <circle
                     cx={stop.x}
                     cy={stop.y}
-                    r={11}
+                    r={12}
                     fill="#c5a059"
                     filter={`url(#${glowId})`}
-                    initial={reduce ? false : { scale: 0, opacity: 0 }}
-                    whileInView={reduce ? undefined : { scale: 1, opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{
-                      delay: 0.4 + index * 0.1,
-                      type: 'spring',
-                      stiffness: 260,
-                      damping: 18,
-                    }}
-                    style={{ transformOrigin: `${stop.x}px ${stop.y}px` }}
                   />
                   <text
                     x={stop.x}
                     y={stop.y + 4.5}
                     textAnchor="middle"
                     fill="#0c0c0c"
-                    fontSize={11}
+                    fontSize={12}
                     fontWeight={700}
                     style={{ pointerEvents: 'none' }}
                   >
                     {n}
                   </text>
 
-                  {/* Labels from sm up — mobile uses the list below */}
                   <g className="hidden sm:block" aria-hidden>
                     {needsLeader ? (
                       <line
@@ -400,7 +387,6 @@ export function JourneyCountryMap({
           </svg>
         </div>
 
-        {/* All stops fully visible — stacked on phones, grid on larger screens */}
         <ol className="mt-4 grid grid-cols-1 gap-2 border-t border-white/10 pt-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           {stops.map((stop, index) => (
             <li
